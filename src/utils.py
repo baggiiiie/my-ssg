@@ -138,7 +138,7 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
 
 
 def text_to_textnodes(text: str | None) -> list[TextNode]:
-    # take a markdown string and turn it into a list of textnodes
+    # take a markdown string and turn it into a list of TextNodes
     if not text:
         return []
     original = TextNode(text, TextType.TEXT)
@@ -150,9 +150,38 @@ def text_to_textnodes(text: str | None) -> list[TextNode]:
     return after_image
 
 
+def markdown_to_blocks(markdown: str | None) -> list[str]:
+    # find block by \n\n delimiter
+    # strip leading and trailing whitespace
+    # remove empty block
+    def format_paragraph(block: str | None) -> str:
+        if not block:
+            return ""
+        lines = block.split("\n")
+        print(lines)
+        new_block = []
+        for line in lines:
+            line = line.strip()
+            if not line:  # remove empty lines
+                continue
+            new_block.append(line)
+        return "\n".join(new_block)
+
+    if not markdown:
+        return []
+    new_blocks = []
+    blocks = markdown.split("\n\n")
+    for block in blocks:
+        if not block:
+            continue
+        new_block = format_paragraph(block)
+        new_blocks.append(new_block)
+    return new_blocks
+
+
 if __name__ == "__main__":
-    text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-    node = TextNode(text, TextType.TEXT)
-    new_nodes = text_to_textnodes(text)
-    print(text)
-    print(new_nodes)
+    md = """    - This is a list
+    - with items
+    """
+    blocks = markdown_to_blocks(md)
+    print(blocks)

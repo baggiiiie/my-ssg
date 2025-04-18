@@ -10,6 +10,7 @@ from utils import (
     split_nodes_link,
     split_nodes_image,
     text_to_textnodes,
+    markdown_to_blocks,
 )
 
 
@@ -234,6 +235,26 @@ class TestUtils(unittest.TestCase):
         text = "this is a broken ` code ` *block"
         with self.assertRaises(Exception):
             text_to_textnodes(text)
+
+    def test_markdown_to_blocks(self):
+        md = """
+    This is **bolded** paragraph
+
+    This is another paragraph with _italic_ text and `code` here
+    This is the same paragraph on a new line
+
+    - This is a list
+    - with items
+    """
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
 
 
 if __name__ == "__main__":
