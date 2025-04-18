@@ -2,6 +2,14 @@ from textnode import TextType
 from htmlnode import LeafNode
 from textnode import TextNode
 
+DELIMITER_TO_TEXTTYPE_MAPPING = {
+    "`": TextType.CODE,
+    "*": TextType.ITALIC,
+    "_": TextType.ITALIC,
+    "**": TextType.BOLD,
+    "__": TextType.BOLD,
+}
+
 
 def text_node_to_html_node(text_node: TextNode) -> LeafNode:
     if text_node.text_type == TextType.TEXT:
@@ -18,3 +26,28 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
         return LeafNode("img", "", props={"src": text_node.url, "alt": text_node.text})
     else:
         raise ValueError("Invalid text type")
+
+
+def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: TextType) -> list:
+    # what we wanna do: 1. split by delimiter, 2. put into llist, 3. return list
+    # situation to consider: multiple of same delimiters in a row, no closing delimiter, nested delimiters
+    new_nodes = []
+    for node in old_nodes:
+        if not isinstance(node, TextNode):
+            new_nodes.append(node)
+            continue
+        # TODO: deal with no closing delimiter
+        contents = node.text.split(delimiter)
+        if (
+            len(contents) % 2 == 0
+        ):  # even number of length indicates no closing delimiter
+            raise Exception("No closing delimiter")
+        for index, content in enumerate(contents):
+            # if index is odd, it's inside the delimiter
+            if index % 2 == 0:
+                # outside of the delimiter might not be text?
+                new_nodes.append(TextNode(content, TextType.TEXT))
+            else:
+                new_nodes.append(TextNode(content, text_type))
+
+    return new_nodes
