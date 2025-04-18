@@ -56,6 +56,7 @@ def split_nodes_delimiter(
     return new_nodes
 
 
+# NOTE: this is only used in UT for now
 def split_nodes_delimiters(old_nodes: list[TextNode]) -> list[TextNode]:
     new_nodes = []
     for delimiter, text_type in DELIMITER_TO_TEXTTYPE_MAPPING.items():
@@ -64,6 +65,7 @@ def split_nodes_delimiters(old_nodes: list[TextNode]) -> list[TextNode]:
     return new_nodes
 
 
+# NOTE: this is only used in UT for now
 def extract_markdown_images(text: str) -> list[tuple]:
     # Returning [(anchor, URL)]
     image_pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
@@ -116,31 +118,41 @@ def split_node(
     return node_list
 
 
-def split_node_image(old_node: TextNode) -> list[TextNode]:
+def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
     text_type = TextType.IMAGE
-    return split_node(old_node, text_type)
+    new_nodes = []
+    for node in old_nodes:
+        new_node = split_node(node, text_type)
+        new_nodes.extend(new_node)
+
+    return new_nodes
 
 
-def split_node_link(old_node: TextNode) -> list[TextNode]:
+def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
     text_type = TextType.LINK
-    return split_node(old_node, text_type)
+    new_nodes = []
+    for node in old_nodes:
+        new_node = split_node(node, text_type)
+        new_nodes.extend(new_node)
+    return new_nodes
 
 
-def text_to_textnodes(text: str) -> list[TextNode]:
+def text_to_textnodes(text: str | None) -> list[TextNode]:
     # take a markdown string and turn it into a list of textnodes
     if not text:
         return []
-    input_text_node = TextNode(text, TextType.TEXT)
-    # delimiter_text_nodes = split_nodes_delimiter(input_text_node)
+    original = TextNode(text, TextType.TEXT)
+    # NOTE: i don't need so many variables, but just keep them for now
+    after_delimiter = split_nodes_delimiters([original])
+    after_link = split_nodes_link(after_delimiter)
+    after_image = split_nodes_image(after_link)
 
-    text_nodes = []
-    ...
-    return text_nodes
+    return after_image
 
 
 if __name__ == "__main__":
-    text = "This is a    `code block` and another `code block` word"
+    text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
     node = TextNode(text, TextType.TEXT)
-    new_nodes = split_nodes_delimiters([node])
+    new_nodes = text_to_textnodes(text)
     print(text)
     print(new_nodes)
