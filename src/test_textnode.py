@@ -17,7 +17,7 @@ class TestTextNode(unittest.TestCase):
 
     def test_eq_different_text_type(self):
         node = TextNode("This is a text node", TextType.BOLD)
-        node2 = TextNode("This is a text node", TextType.NORMAL)
+        node2 = TextNode("This is a text node", TextType.TEXT)
         self.assertNotEqual(node, node2)
 
     def test_eq_not_textnode(self):

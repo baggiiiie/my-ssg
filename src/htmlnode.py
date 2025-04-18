@@ -25,11 +25,16 @@ class HTMLNode:
 
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag: str | None = None, value: str | None = None):
+    def __init__(
+        self,
+        tag: str | None = None,
+        value: str | None = None,
+        props: dict | None = None,
+    ):
         super().__init__(tag, value)
         self.tag = tag
         self.value = value
-        self.props = {}
+        self.props = props if props is not None else {}
 
     def to_html(self) -> str:
         if not self.value:
