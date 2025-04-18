@@ -1,7 +1,12 @@
 import unittest
 
 from textnode import TextNode, TextType
-from utils import text_node_to_html_node, split_nodes_delimiter
+from utils import (
+    text_node_to_html_node,
+    split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
+)
 
 
 class TestUtils(unittest.TestCase):
@@ -65,6 +70,26 @@ class TestUtils(unittest.TestCase):
     #         TextNode("word", TextType.BOLD),
     #     ]
     #     self.assertEqual(new_nodes, expected)
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "this is text with an ![image](https://i.imgur.com/zjjcjkz.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcjkz.png")], matches)
+
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "this is text with an ![image](https://i.imgur.com/zjjcjkz.png)"
+        )
+        self.assertListEqual([], matches)
+
+    def test_extract_markdown_images_with_links(self):
+        text = "this is [link](test) text with an ![image](https://i.imgur.com/zjjcjkz.png)"
+        img_matches = extract_markdown_images(text)
+        link_matches = extract_markdown_links(text)
+        self.assertListEqual(
+            [("image", "https://i.imgur.com/zjjcjkz.png")], img_matches
+        )
+        self.assertListEqual([("link", "test")], link_matches)
 
 
 if __name__ == "__main__":
