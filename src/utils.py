@@ -60,13 +60,13 @@ def extract_markdown_images(text: str) -> list[tuple]:
 
 
 def extract_markdown_image(text: str) -> list[tuple]:
-    # Returning [(anchor, URL)]
     image_pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
-    matches = re.search(image_pattern, text)
+    matches = re.findall(image_pattern, text)
     return matches
 
 
 def extract_markdown_links(text: str) -> list[tuple]:
+    # Returning [(anchor, URL)]
     link_pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
     matches = re.findall(link_pattern, text)
     return matches
@@ -78,7 +78,8 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
         # Read node and check value
         # how to split?
         links = extract_markdown_links(node.text)
-        parts = node.text.split(links[0][0])
+        for anchor, url in links:
+            parts = node.text.split(f"[{anchor}]({url})", 1)
         ...
         new_nodes.append(node)
 
