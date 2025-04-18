@@ -1,6 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
+from htmlblock import BlockType
 from utils import (
     text_node_to_html_node,
     split_nodes_delimiter,
@@ -11,6 +12,7 @@ from utils import (
     split_nodes_image,
     text_to_textnodes,
     markdown_to_blocks,
+    block_to_block_type,
 )
 
 
@@ -254,6 +256,41 @@ class TestUtils(unittest.TestCase):
                 "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
                 "- This is a list\n- with items",
             ],
+        )
+
+    def test_block_to_block_type_code(self):
+        block = "```test```"
+        self.assertEqual(
+            block_to_block_type(block),
+            BlockType.CODE,
+        )
+
+    def test_block_to_block_type_not_code(self):
+        block = "```test``"
+        self.assertEqual(
+            block_to_block_type(block),
+            BlockType.PARAGRAPH,
+        )
+
+    def test_block_to_block_type_quote(self):
+        block = "> test\n> test2"
+        self.assertEqual(
+            block_to_block_type(block),
+            BlockType.QUOTE,
+        )
+
+    def test_block_to_block_type_quote_2(self):
+        block = "> test\n> test2"
+        self.assertEqual(
+            block_to_block_type(block),
+            BlockType.QUOTE,
+        )
+
+    def test_block_to_block_type_not_quote(self):
+        block = ">test"
+        self.assertEqual(
+            block_to_block_type(block),
+            BlockType.PARAGRAPH,
         )
 
 
