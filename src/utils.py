@@ -5,10 +5,11 @@ from textnode import TextNode
 
 DELIMITER_TO_TEXTTYPE_MAPPING = {
     "`": TextType.CODE,
-    "*": TextType.ITALIC,
-    "_": TextType.ITALIC,
+    # i think i'll need to put BOLD before ITALIC?
     "**": TextType.BOLD,
     "__": TextType.BOLD,
+    "*": TextType.ITALIC,
+    "_": TextType.ITALIC,
 }
 
 
@@ -29,8 +30,11 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
         raise ValueError("Invalid text type")
 
 
-def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: TextType) -> list:
+def split_nodes_delimiter(
+    old_nodes: list, delimiter: str, text_type: TextType
+) -> list[TextNode]:
     # TODO: include nested delimiter, meaning we should have parent and children TextNode?
+    # NOTE: TextNode could be broken into multiple TextNode
     new_nodes = []
     for node in old_nodes:
         if not isinstance(node, TextNode):
@@ -45,10 +49,18 @@ def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: TextType) 
             # if index is odd, it's inside the delimiter
             if index % 2 == 0:
                 # outside of the delimiter might not be text?
-                new_nodes.append(TextNode(content, TextType.TEXT))
+                if content:
+                    new_nodes.append(TextNode(content, node.text_type))
             else:
                 new_nodes.append(TextNode(content, text_type))
+    return new_nodes
 
+
+def split_nodes_delimiters(old_nodes: list[TextNode]) -> list[TextNode]:
+    new_nodes = []
+    for delimiter, text_type in DELIMITER_TO_TEXTTYPE_MAPPING.items():
+        new_nodes = split_nodes_delimiter(old_nodes, delimiter, text_type)
+        old_nodes = new_nodes
     return new_nodes
 
 
@@ -114,11 +126,21 @@ def split_node_link(old_node: TextNode) -> list[TextNode]:
     return split_node(old_node, text_type)
 
 
-if __name__ == "__main__":
-    # Test the functions
-    text = "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)"
+def text_to_textnodes(text: str) -> list[TextNode]:
+    # take a markdown string and turn it into a list of textnodes
+    if not text:
+        return []
+    input_text_node = TextNode(text, TextType.TEXT)
+    # delimiter_text_nodes = split_nodes_delimiter(input_text_node)
 
+    text_nodes = []
+    ...
+    return text_nodes
+
+
+if __name__ == "__main__":
+    text = "This is a    `code block` and another `code block` word"
     node = TextNode(text, TextType.TEXT)
-    new_nodes = split_node_image(node)
-    new_nodes = split_node_link(node)
+    new_nodes = split_nodes_delimiters([node])
+    print(text)
     print(new_nodes)

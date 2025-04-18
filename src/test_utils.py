@@ -4,6 +4,7 @@ from textnode import TextNode, TextType
 from utils import (
     text_node_to_html_node,
     split_nodes_delimiter,
+    split_nodes_delimiters,
     extract_markdown_images,
     extract_markdown_links,
     split_node_link,
@@ -41,6 +42,26 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(len(new_nodes), 3)
         self.assertEqual(new_nodes, expected)
 
+    def test_split_textnodes_start(self):
+        node = TextNode("`code block` word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+        expected = [
+            TextNode("code block", TextType.CODE),
+            TextNode(" word", TextType.TEXT),
+        ]
+        self.assertEqual(len(new_nodes), 2)
+        self.assertEqual(new_nodes, expected)
+
+    def test_split_textnodes_end(self):
+        node = TextNode("word `code block`", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+        expected = [
+            TextNode("word ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+        ]
+        self.assertEqual(len(new_nodes), 2)
+        self.assertEqual(new_nodes, expected)
+
     def test_split_textnodes_no_closing(self):
         node = TextNode("This is text with a `code block word", TextType.TEXT)
         with self.assertRaises(Exception):
@@ -59,6 +80,49 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(len(new_nodes), 5)
         self.assertEqual(new_nodes, expected)
 
+    def test_split_textnodes_delimiters_with_space(self):
+        node = TextNode(
+            "This is a    `code block` and another `code block` word", TextType.TEXT
+        )
+        new_nodes = split_nodes_delimiters([node])
+        expected = [
+            TextNode("This is a    ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and another ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" word", TextType.TEXT),
+        ]
+        self.assertEqual(len(new_nodes), 5, f"new nodes are {new_nodes}")
+        self.assertEqual(new_nodes, expected, f"new nodes are {new_nodes}")
+
+    def test_split_textnodes_same_delimiters(self):
+        node = TextNode(
+            "This is a `code block` and another `code block` word", TextType.TEXT
+        )
+        new_nodes = split_nodes_delimiters([node])
+        expected = [
+            TextNode("This is a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" and another ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" word", TextType.TEXT),
+        ]
+        self.assertEqual(len(new_nodes), 5, f"new nodes are {new_nodes}")
+        self.assertEqual(new_nodes, expected, f"new nodes are {new_nodes}")
+
+    def test_split_textnodes_diff_delimiters(self):
+        node = TextNode("This is *italic text* and a `code block` word", TextType.TEXT)
+        new_nodes = split_nodes_delimiters([node])
+        expected = [
+            TextNode("This is ", TextType.TEXT),
+            TextNode("italic text", TextType.ITALIC),
+            TextNode(" and a ", TextType.TEXT),
+            TextNode("code block", TextType.CODE),
+            TextNode(" word", TextType.TEXT),
+        ]
+        self.assertEqual(len(new_nodes), 5, f"new nodes are {new_nodes}")
+        self.assertEqual(new_nodes, expected, f"new nodes are {new_nodes}")
+
     # TODO: Need to add support for mixed delimiters
     # def test_split_textnodes_multiple_mixed(self):
     #     node = TextNode("This is *text with* a `code block` **word**", TextType.TEXT)
@@ -72,6 +136,7 @@ class TestUtils(unittest.TestCase):
     #         TextNode("word", TextType.BOLD),
     #     ]
     #     self.assertEqual(new_nodes, expected)
+
     def test_extract_markdown_images(self):
         matches = extract_markdown_images(
             "this is text with an ![image](https://i.imgur.com/zjjcjkz.png)"
