@@ -30,8 +30,7 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
 
 
 def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: TextType) -> list:
-    # what we wanna do: 1. split by delimiter, 2. put into list, 3. return list
-    # situation to consider: multiple of same delimiters in a row, no closing delimiter, nested delimiters
+    # TODO: include nested delimiter, meaning we should have parent and children TextNode?
     new_nodes = []
     for node in old_nodes:
         if not isinstance(node, TextNode):
