@@ -72,6 +72,30 @@ def extract_markdown_links(text: str) -> list[tuple]:
     return matches
 
 
+def split_node_link(old_node: TextNode, node_list: list[TextNode]) -> list[TextNode]:
+    # take 1 TextNode, find the first link
+    # save before-link as TEXT and link as LINK in list
+    # save the rest as another TextNode, pass into recursion
+    def find_link(text: str) -> tuple[str, str] | tuple[None, None]:
+        link_pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
+        match = re.search(link_pattern, text)
+        if match:
+            anchor, url = match.groups()
+            return anchor, url
+        return None, None
+
+    anchor, url = find_link(old_node.text)
+    if not anchor:
+        # no link found, return the original node
+        node_list.append(old_node)
+        return [old_node]
+    parts = old_node.text.split(f"[{anchor}]({url})", 1)
+    node_list.append(TextNode(parts[0], TextType.TEXT))
+    node_list.append(TextNode(anchor, TextType.LINK, url))
+    split_node_link(TextNode(parts[1], TextType.TEXT), node_list)
+    return node_list
+
+
 def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
     new_nodes = []
     for node in old_nodes:
@@ -91,5 +115,7 @@ def split_nodes_image(old_nodes): ...
 
 if __name__ == "__main__":
     # Test the functions
-    text = "This is a bold ![text and this](test) is _italic_ text."
-    print(extract_markdown_image(text))
+    text = "This is a bold [text and this](url//url/url) is _italic_ text. imma shove another [link](https://) to see if it works"
+    node = TextNode(text, TextType.TEXT)
+    new_nodes = split_node_link(node, [])
+    print(new_nodes)
