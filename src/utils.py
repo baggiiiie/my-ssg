@@ -65,57 +65,59 @@ def extract_markdown_image(text: str) -> list[tuple]:
     return matches
 
 
-def extract_markdown_links(text: str) -> list[tuple]:
-    # Returning [(anchor, URL)]
-    link_pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
-    matches = re.findall(link_pattern, text)
-    return matches
+def find_pattern(pattern: str, text: str) -> tuple[str, str] | tuple[None, None]:
+    match = re.search(pattern, text)
+    if match:
+        anchor, url = match.groups()
+        return anchor, url
+    return None, None
 
 
-def split_node_link(old_node: TextNode, node_list: list[TextNode]) -> list[TextNode]:
+def split_node(
+    old_node: TextNode, text_type: TextType, node_list: list[TextNode] | None = None
+) -> list[TextNode]:
     # take 1 TextNode, find the first link
     # save before-link as TEXT and link as LINK in list
     # save the rest as another TextNode, pass into recursion
-    def find_link(text: str) -> tuple[str, str] | tuple[None, None]:
-        link_pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
-        match = re.search(link_pattern, text)
-        if match:
-            anchor, url = match.groups()
-            return anchor, url
-        return None, None
+    if not node_list:
+        node_list = []
+    if text_type == TextType.LINK:
+        regex_pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
+        split_pattern = "[{}]({})"
+    else:
+        # IMAGE
+        regex_pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
+        split_pattern = "![{}]({})"
 
-    anchor, url = find_link(old_node.text)
+    anchor, url = find_pattern(regex_pattern, old_node.text)
     if not anchor:
         # no link found, return the original node
-        node_list.append(old_node)
+        if old_node.text:
+            node_list.append(old_node)
         return [old_node]
-    parts = old_node.text.split(f"[{anchor}]({url})", 1)
+
+    parts = old_node.text.split(split_pattern.format(anchor, url), 1)
     node_list.append(TextNode(parts[0], TextType.TEXT))
-    node_list.append(TextNode(anchor, TextType.LINK, url))
-    split_node_link(TextNode(parts[1], TextType.TEXT), node_list)
+    node_list.append(TextNode(anchor, text_type, url))
+    split_node(TextNode(parts[1], TextType.TEXT), text_type, node_list)
     return node_list
 
 
-def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
-    new_nodes = []
-    for node in old_nodes:
-        # Read node and check value
-        # how to split?
-        links = extract_markdown_links(node.text)
-        for anchor, url in links:
-            parts = node.text.split(f"[{anchor}]({url})", 1)
-        ...
-        new_nodes.append(node)
-
-    return new_nodes
+def split_node_image(old_node: TextNode) -> list[TextNode]:
+    text_type = TextType.IMAGE
+    return split_node(old_node, text_type)
 
 
-def split_nodes_image(old_nodes): ...
+def split_node_link(old_node: TextNode) -> list[TextNode]:
+    text_type = TextType.LINK
+    return split_node(old_node, text_type)
 
 
 if __name__ == "__main__":
     # Test the functions
-    text = "This is a bold [text and this](url//url/url) is _italic_ text. imma shove another [link](https://) to see if it works"
+    text = "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)"
+
     node = TextNode(text, TextType.TEXT)
-    new_nodes = split_node_link(node, [])
+    new_nodes = split_node_image(node)
+    new_nodes = split_node_link(node)
     print(new_nodes)

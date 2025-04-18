@@ -6,8 +6,8 @@ from utils import (
     split_nodes_delimiter,
     extract_markdown_images,
     extract_markdown_links,
-    split_nodes_link,
-    split_nodes_image,
+    split_node_link,
+    split_node_image,
 )
 
 
@@ -99,7 +99,7 @@ class TestUtils(unittest.TestCase):
             TextType.TEXT,
         )
 
-        new_nodes = split_nodes_link([node])
+        new_nodes = split_node_link(node)
         expected = [
             TextNode("This is text with a link ", TextType.TEXT),
             TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
@@ -108,13 +108,14 @@ class TestUtils(unittest.TestCase):
                 "to youtube", TextType.LINK, "https://www.youtube.com/@bootdotdev"
             ),
         ]
+        self.assertListEqual(new_nodes, expected)
 
     def test_split_images(self):
         node = TextNode(
             "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
             TextType.TEXT,
         )
-        new_nodes = split_nodes_image([node])
+        new_nodes = split_node_image(node)
         self.assertListEqual(
             [
                 TextNode("This is text with an ", TextType.TEXT),
