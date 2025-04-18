@@ -19,6 +19,8 @@ class TextNode:
     def __eq__(self, other) -> bool:
         if other is None:
             return False
+        if not isinstance(other, TextNode):
+            return False
         if other.text != self.text:
             return False
         if other.text_type != self.text_type:
