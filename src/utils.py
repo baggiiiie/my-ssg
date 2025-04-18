@@ -30,7 +30,7 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
 
 
 def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: TextType) -> list:
-    # what we wanna do: 1. split by delimiter, 2. put into llist, 3. return list
+    # what we wanna do: 1. split by delimiter, 2. put into list, 3. return list
     # situation to consider: multiple of same delimiters in a row, no closing delimiter, nested delimiters
     new_nodes = []
     for node in old_nodes:
@@ -39,9 +39,8 @@ def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: TextType) 
             continue
         # TODO: deal with no closing delimiter
         contents = node.text.split(delimiter)
-        if (
-            len(contents) % 2 == 0
-        ):  # even number of length indicates no closing delimiter
+        # even number of length indicates no closing delimiter
+        if len(contents) % 2 == 0:
             raise Exception("No closing delimiter")
         for index, content in enumerate(contents):
             # if index is odd, it's inside the delimiter
@@ -55,8 +54,16 @@ def split_nodes_delimiter(old_nodes: list, delimiter: str, text_type: TextType) 
 
 
 def extract_markdown_images(text: str) -> list[tuple]:
+    # Returning [(anchor, URL)]
     image_pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
     matches = re.findall(image_pattern, text)
+    return matches
+
+
+def extract_markdown_image(text: str) -> list[tuple]:
+    # Returning [(anchor, URL)]
+    image_pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
+    matches = re.search(image_pattern, text)
     return matches
 
 
@@ -64,3 +71,25 @@ def extract_markdown_links(text: str) -> list[tuple]:
     link_pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
     matches = re.findall(link_pattern, text)
     return matches
+
+
+def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
+    new_nodes = []
+    for node in old_nodes:
+        # Read node and check value
+        # how to split?
+        links = extract_markdown_links(node.text)
+        parts = node.text.split(links[0][0])
+        ...
+        new_nodes.append(node)
+
+    return new_nodes
+
+
+def split_nodes_image(old_nodes): ...
+
+
+if __name__ == "__main__":
+    # Test the functions
+    text = "This is a bold ![text and this](test) is _italic_ text."
+    print(extract_markdown_image(text))
