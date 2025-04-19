@@ -1,7 +1,7 @@
 import re
 from htmlblock import BlockType
 from textnode import TextType
-from htmlnode import LeafNode
+from htmlnode import LeafNode, HTMLNode
 from textnode import TextNode
 
 DELIMITER_TO_TEXTTYPE_MAPPING = {
@@ -249,7 +249,37 @@ def block_to_block_type(markdown: str | None) -> BlockType:
     return BlockType.PARAGRAPH
 
 
+def markdown_to_html_node(md: str) -> HTMLNode:
+    # converts a full markdown string into a single parent HTMLNode
+    # convert md to blocks
+    # for each block, convert to textnodes
+    # for each textnode, convert to LeafNode
+    # put LeafNodes (inline) into ParentNode (block)
+    # put ParentNode (block) into HTMLNode (document)
+    # return a single parent HTMLNode
+    blocks = markdown_to_blocks(md)
+    parent_nodes = []
+    for block in blocks:
+        block_type = block_to_block_type(block)
+        text_nodes = text_to_textnodes(block)
+        leaf_nodes = []
+        for text_node in text_nodes:
+            html_node = text_node_to_html_node(text_node)
+            leaf_nodes.append(html_node)
+        parent_nodes.append(HTMLNode(tag=block_type.value, children=leaf_nodes))
+
+    html_node = HTMLNode(tag="html", children=[parent_nodes])
+    return html_node
+
+
 if __name__ == "__main__":
-    md = "1. test\n2. test2"
-    blocks = check_ordered_list(md)
-    print(blocks)
+    md = """
+    This is **bolded** paragraph
+    text in a p
+    tag here
+
+    This is another paragraph with _italic_ text and `code` here
+
+    """
+    node = markdown_to_html_node(md)
+    print(node.to_html())

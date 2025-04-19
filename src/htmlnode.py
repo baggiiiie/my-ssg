@@ -12,6 +12,7 @@ class HTMLNode:
         self.props = props if props is not None else {}
 
     def to_html(self) -> str:
+        # NOTE: when this is called, it should go recursively to the children
         raise NotImplementedError("Currently not implemented")
 
     def props_to_html(self) -> str:
