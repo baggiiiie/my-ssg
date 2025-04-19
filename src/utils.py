@@ -1,7 +1,7 @@
 import re
 from htmlblock import BlockType
 from textnode import TextType
-from htmlnode import LeafNode, HTMLNode
+from htmlnode import LeafNode, HTMLNode, ParentNode
 from textnode import TextNode
 
 DELIMITER_TO_TEXTTYPE_MAPPING = {
@@ -14,7 +14,7 @@ DELIMITER_TO_TEXTTYPE_MAPPING = {
 }
 
 
-def text_node_to_html_node(text_node: TextNode) -> LeafNode:
+def text_node_to_html_leaf_node(text_node: TextNode) -> LeafNode:
     if text_node.text_type == TextType.TEXT:
         return LeafNode(None, text_node.text)
     elif text_node.text_type == TextType.BOLD:
@@ -258,18 +258,18 @@ def markdown_to_html_node(md: str) -> HTMLNode:
     # put ParentNode (block) into HTMLNode (document)
     # return a single parent HTMLNode
     blocks = markdown_to_blocks(md)
-    parent_nodes = []
+    block_nodes = []
     for block in blocks:
         block_type = block_to_block_type(block)
         text_nodes = text_to_textnodes(block)
-        leaf_nodes = []
+        inline_nodes = []
         for text_node in text_nodes:
-            html_node = text_node_to_html_node(text_node)
-            leaf_nodes.append(html_node)
-        parent_nodes.append(HTMLNode(tag=block_type.value, children=leaf_nodes))
+            leaf_node = text_node_to_html_leaf_node(text_node)
+            inline_nodes.append(leaf_node)
+        block_nodes.append(ParentNode(tag=block_type.value, children=inline_nodes))
 
-    html_node = HTMLNode(tag="html", children=[parent_nodes])
-    return html_node
+    leaf_node = HTMLNode(tag="html", children=[block_nodes])
+    return leaf_node
 
 
 if __name__ == "__main__":
