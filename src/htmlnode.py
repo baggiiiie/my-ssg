@@ -13,7 +13,16 @@ class HTMLNode:
 
     def to_html(self) -> str:
         # NOTE: when this is called, it should go recursively to the children
-        raise NotImplementedError("Currently not implemented")
+        if not self.children:
+            return ""
+        html_text = f"<{self.tag}{self.props_to_html()}>"
+        for child in self.children:
+            # if not isinstance(child, HTMLNode):
+            #     print(type(child))
+            #     print(child)
+            #     raise TypeError("Children must be HTMLNode instances")
+            html_text += child.to_html()
+        return html_text + f"</{self.tag}>"
 
     def props_to_html(self) -> str:
         html_text = ""
@@ -32,14 +41,14 @@ class LeafNode(HTMLNode):
         value: str | None = None,
         props: dict | None = None,
     ):
-        super().__init__(tag, value)
+        super().__init__(tag=tag, value=value, children=None, props=props)
         self.tag = tag
         self.value = value
         self.props = props if props is not None else {}
 
     def to_html(self) -> str:
         if not self.value:
-            raise ValueError("Value cannot be None")
+            raise ValueError("LeafNode's value cannot be None")
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
 
@@ -51,18 +60,21 @@ class ParentNode(HTMLNode):
         props: dict | None = None,
     ):
         super().__init__(tag=tag, value=None, children=children, props=props)
+        if not tag:
+            raise ValueError("ParentNode's tag cannot be None")
+        if not children:
+            raise ValueError("ParentNode's children cannot be None")
         self.tag = tag
-        self.children = children if children is not None else []
+        self.children = children
         self.props = props if props is not None else {}
 
     def to_html(self) -> str:
-        if not self.tag:
-            raise ValueError("Tag cannot be None")
-        if not self.children:
-            raise ValueError("Children cannot be None")
         html_text = f"<{self.tag}{self.props_to_html()}>"
 
         for child in self.children:
+            # if not isinstance(child, HTMLNode):
+            #     raise TypeError("ParentNode's children must be HTMLNode instances")
+            # NOTE: CONTEXT SWITCH - how to call `.to_html()` on child? when the child has children, `list.to_html()` is called and it raises errors
             html_text += child.to_html()
 
         html_text += f"</{self.tag}>"

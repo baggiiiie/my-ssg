@@ -260,15 +260,19 @@ def markdown_to_html_node(md: str) -> HTMLNode:
     blocks = markdown_to_blocks(md)
     block_nodes = []
     for block in blocks:
+        # TODO: should this if check be here? or does it make more sense to put it somewhere else?
+        if not block:
+            continue
         block_type = block_to_block_type(block)
         text_nodes = text_to_textnodes(block)
         inline_nodes = []
         for text_node in text_nodes:
             leaf_node = text_node_to_html_leaf_node(text_node)
             inline_nodes.append(leaf_node)
+
         block_nodes.append(ParentNode(tag=block_type.value, children=inline_nodes))
 
-    leaf_node = HTMLNode(tag="html", children=[block_nodes])
+    leaf_node = HTMLNode(tag="html", children=block_nodes)
     return leaf_node
 
 
@@ -282,4 +286,5 @@ if __name__ == "__main__":
 
     """
     node = markdown_to_html_node(md)
+    print(node)
     print(node.to_html())
