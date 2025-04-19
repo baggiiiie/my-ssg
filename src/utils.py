@@ -272,7 +272,7 @@ def markdown_to_html_node(md: str) -> HTMLNode:
 
         block_nodes.append(ParentNode(tag=block_type.value, children=inline_nodes))
 
-    leaf_node = HTMLNode(tag="html", children=block_nodes)
+    leaf_node = HTMLNode(tag="div", children=block_nodes)
     return leaf_node
 
 
