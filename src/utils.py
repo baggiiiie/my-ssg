@@ -160,27 +160,35 @@ def markdown_to_blocks(markdown: str | None) -> list[str]:
             return ""
         lines = block.split("\n")
         new_block = []
+        current_line = ""
         for line in lines:
-            line = line.strip()
             if not line:  # remove empty lines
                 continue
-            new_block.append(line)
-        return "\n".join(new_block)
+            if line.endswith("  "):
+                line = line.strip()
+                current_line += line + "\n"
+                continue
+
+            # line doesn't end with 2 or more spaces, append a space and append next line
+            current_line += line.strip() + " "
+            new_block.append(current_line)
+            current_line = ""
+        return "".join(new_block)
 
     if not markdown:
         return []
     new_blocks = []
     blocks = markdown.split("\n\n")
     for block in blocks:
-        if not block:
+        if not block or block.isspace():
             continue
         new_block = format_paragraph(block)
-        new_blocks.append(new_block)
+        new_blocks.append(new_block.strip())
     return new_blocks
 
 
 def check_heading(md: str) -> bool:
-    # NOTE: do i have to come back eventaully to count???
+    # NOTE: do i have to come back eventually to count???
     regex = r"^#{1,6} "
     match = re.match(regex, md)
     if match:
@@ -278,13 +286,14 @@ def markdown_to_html_node(md: str) -> HTMLNode:
 
 if __name__ == "__main__":
     md = """
-    This is **bolded** paragraph
-    text in a p
-    tag here
+        This is **bolded** paragraph
 
-    This is another paragraph with _italic_ text and `code` here
+    This is another paragraph with _italic_ text and `code` here  
+    This is the same paragraph on a new line
+
+    - This is a list
 
     """
-    node = markdown_to_html_node(md)
+    node = markdown_to_blocks(md)
     print(node)
-    print(node.to_html())
+    # print(node.to_html())
