@@ -152,6 +152,7 @@ def text_to_textnodes(text: str | None) -> list[TextNode]:
 
 
 def format_paragraph(block: str | None) -> str:
+    # paragraphs: deal with trailing spaces
     if not block:
         return ""
     lines = block.split("\n")
@@ -172,17 +173,34 @@ def format_paragraph(block: str | None) -> str:
     return "".join(new_block)
 
 
+def format_others(md: str) -> str:
+    # format the input md string
+    # if it's a new line, it's a new line
+    # no trailing spaces logic
+    ...
+    return ""
+
+
 def markdown_to_blocks(markdown: str | None) -> list[str]:
     if not markdown:
         return []
-    new_blocks = []
-    blocks = markdown.split("\n\n")
-    for block in blocks:
-        if not block or block.isspace():
-            continue
-        new_block = format_paragraph(block)
-        new_blocks.append(new_block.strip())
-    return new_blocks
+    # new_blocks = []
+    return markdown.strip().split("\n\n")
+    # for block in blocks:
+    #     if not block or block.isspace():
+    #         continue
+    #     new_block = format_paragraph(block)
+    #     new_blocks.append(new_block.strip())
+    # return new_blocks
+
+
+def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str:
+    if not block:
+        return ""
+    if block_type == BlockType.PARAGRAPH:
+        block = format_paragraph(block)
+    # NOTE: no format for other block types yet
+    return block.strip()
 
 
 def check_heading(md: str) -> bool:
@@ -266,10 +284,8 @@ def markdown_to_html_node(md: str) -> HTMLNode:
     blocks = markdown_to_blocks(md)
     block_nodes = []
     for block in blocks:
-        # TODO: should this if check be here? or does it make more sense to put it somewhere else?
-        if not block:
-            continue
         block_type = block_to_block_type(block)
+        block = format_block(block, block_type)
         text_nodes = text_to_textnodes(block)
         inline_nodes = []
         for text_node in text_nodes:
@@ -285,13 +301,13 @@ def markdown_to_html_node(md: str) -> HTMLNode:
 if __name__ == "__main__":
     md = """
         This is **bolded** paragraph
+        text in a p
+        tag here
 
-    This is another paragraph with _italic_ text and `code` here  
-    This is the same paragraph on a new line
+        This is another paragraph with _italic_ text and `code` here
 
-    - This is a list
 
-    """
-    node = markdown_to_blocks(md)
-    print(node)
-    # print(node.to_html())
+
+        """
+    blocks = markdown_to_blocks(md)
+    print(blocks)
