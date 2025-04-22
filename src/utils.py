@@ -163,7 +163,7 @@ def format_paragraph(block: str | None) -> str:
             continue
         if line.endswith("  "):
             line = line.strip()
-            current_line += line + "\n"
+            current_line += line + "\\n"
             continue
 
         # line doesn't end with 2 or more spaces, append a space and append next line
@@ -177,8 +177,13 @@ def format_others(md: str) -> str:
     # format the input md string
     # if it's a new line, it's a new line
     # no trailing spaces logic
-    ...
-    return ""
+    lines = md.split("\n")
+    new_lines = []
+    for line in lines:
+        line = line.strip()
+        new_lines.append(line)
+    # md = md.replace("\n", "\\n")
+    return "\\n".join(new_lines)
 
 
 def markdown_to_blocks(markdown: str | None) -> list[str]:
@@ -199,7 +204,8 @@ def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str | Non
         return None
     if block_type == BlockType.PARAGRAPH:
         block = format_paragraph(block)
-    # NOTE: no format for other block types yet
+    else:
+        block = format_others(block)
     return block.strip()
 
 
