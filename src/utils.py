@@ -151,30 +151,28 @@ def text_to_textnodes(text: str | None) -> list[TextNode]:
     return after_image
 
 
-def markdown_to_blocks(markdown: str | None) -> list[str]:
-    # find block by \n\n delimiter
-    # strip leading and trailing whitespace
-    # remove empty block
-    def format_paragraph(block: str | None) -> str:
-        if not block:
-            return ""
-        lines = block.split("\n")
-        new_block = []
+def format_paragraph(block: str | None) -> str:
+    if not block:
+        return ""
+    lines = block.split("\n")
+    new_block = []
+    current_line = ""
+    for line in lines:
+        if not line:  # remove empty lines
+            continue
+        if line.endswith("  "):
+            line = line.strip()
+            current_line += line + "\n"
+            continue
+
+        # line doesn't end with 2 or more spaces, append a space and append next line
+        current_line += line.strip() + " "
+        new_block.append(current_line)
         current_line = ""
-        for line in lines:
-            if not line:  # remove empty lines
-                continue
-            if line.endswith("  "):
-                line = line.strip()
-                current_line += line + "\n"
-                continue
+    return "".join(new_block)
 
-            # line doesn't end with 2 or more spaces, append a space and append next line
-            current_line += line.strip() + " "
-            new_block.append(current_line)
-            current_line = ""
-        return "".join(new_block)
 
+def markdown_to_blocks(markdown: str | None) -> list[str]:
     if not markdown:
         return []
     new_blocks = []
