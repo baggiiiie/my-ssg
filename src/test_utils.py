@@ -294,7 +294,23 @@ class TestUtils(unittest.TestCase):
         )
 
     def test_block_to_block_type_code(self):
-        block = "```test```"
+        block = """```
+        code
+        ```
+        """
+        self.assertEqual(
+            block_to_block_type(block),
+            BlockType.CODE,
+        )
+
+    def test_block_to_block_type_code_multiline(self):
+        block = """ ```
+        code
+        another code
+
+
+        ```
+        """
         self.assertEqual(
             block_to_block_type(block),
             BlockType.CODE,
@@ -328,23 +344,24 @@ class TestUtils(unittest.TestCase):
             BlockType.PARAGRAPH,
         )
 
-    # def test_paragraphs(self):
-    #     md = """
-    # This is **bolded** paragraph
-    # text in a p
-    # tag here
-    #
-    # This is another paragraph with _italic_ text and `code` here
-    #
-    # """
-    #
-    #     node = markdown_to_html_node(md)
-    #     html = node.to_html()
-    #     expected = "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>"
-    #     self.assertEqual(
-    #         html,
-    #         f"\nhtml text is: {html}\nexpected is {expected}",
-    #     )
+    def test_paragraphs(self):
+        md = """
+    This is **bolded** paragraph
+    text in a p
+    tag here
+
+    This is another paragraph with _italic_ text and `code` here
+
+    """
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        expected = "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>"
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is: {html}\nexpected is {expected}",
+        )
 
     # def test_codeblock(self):
     #     md = """

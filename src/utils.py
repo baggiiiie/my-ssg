@@ -194,9 +194,9 @@ def markdown_to_blocks(markdown: str | None) -> list[str]:
     # return new_blocks
 
 
-def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str:
+def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str | None:
     if not block:
-        return ""
+        return None
     if block_type == BlockType.PARAGRAPH:
         block = format_paragraph(block)
     # NOTE: no format for other block types yet
@@ -213,9 +213,9 @@ def check_heading(md: str) -> bool:
 
 
 def check_code_block(md: str) -> bool:
-    regex = r"^```.*?```$"
-    match_start = re.match(regex, md)
-    if match_start:
+    regex = r"```(.*?)\n([\s\S]*?)```"
+    match = re.match(regex, md)
+    if match:
         return True
     return False
 
@@ -268,7 +268,7 @@ def block_to_block_type(markdown: str | None) -> BlockType:
     if not markdown:
         return BlockType.PARAGRAPH
     for block_type, checker in BLOCK_TYPE_CHECKER.items():
-        if checker(markdown):
+        if checker(markdown.strip()):
             return block_type
     return BlockType.PARAGRAPH
 
@@ -285,6 +285,8 @@ def markdown_to_html_node(md: str) -> HTMLNode:
     block_nodes = []
     for block in blocks:
         block_type = block_to_block_type(block)
+        print(f"Block type: {block_type}")
+        print(block)
         block = format_block(block, block_type)
         text_nodes = text_to_textnodes(block)
         inline_nodes = []
@@ -304,10 +306,14 @@ if __name__ == "__main__":
         text in a p
         tag here
 
-        This is another paragraph with _italic_ text and `code` here
+        This is another paragraph with _italic_ text and `code` here  
+        new line here
 
-
-
+        ```
+        new line here
+        new line again
+        ```
         """
-    blocks = markdown_to_blocks(md)
-    print(blocks)
+    node = markdown_to_html_node(md)
+    html = node.to_html()
+    print(html)
