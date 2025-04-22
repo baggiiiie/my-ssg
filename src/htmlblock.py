@@ -8,3 +8,5 @@ class BlockType(Enum):
     QUOTE = "blockquote"
     UNORDERED_LIST = "ul"
     ORDERED_LIST = "ol"
+    HORIZONTAL_RULE = "hr"
+    TABLE = "table"
