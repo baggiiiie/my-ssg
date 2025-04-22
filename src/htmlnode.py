@@ -12,7 +12,6 @@ class HTMLNode:
         self.props = props if props is not None else {}
 
     def to_html(self) -> str:
-        # NOTE: when this is called, it should go recursively to the children
         html_text = f"<{self.tag}{self.props_to_html()}>" if self.tag else ""
 
         for child in self.children:
@@ -41,9 +40,6 @@ class LeafNode(HTMLNode):
         props: dict | None = None,
     ):
         super().__init__(tag=tag, value=value, children=None, props=props)
-        # self.tag = tag
-        # self.value = value
-        # self.props = props if props is not None else {}
 
     def to_html(self) -> str:
         if not self.value:
@@ -65,7 +61,9 @@ class ParentNode(HTMLNode):
             raise ValueError("ParentNode's tag cannot be None")
         if not children:
             raise ValueError("ParentNode's children cannot be None")
-        super().__init__(tag=tag, value=None, children=children, props=props)
-        # self.tag = tag
-        # self.children = children
-        # self.props = props if props is not None else {}
+        super().__init__(
+            tag=tag,
+            value=None,
+            children=children,
+            props=props,
+        )

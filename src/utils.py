@@ -285,8 +285,6 @@ def markdown_to_html_node(md: str) -> HTMLNode:
     block_nodes = []
     for block in blocks:
         block_type = block_to_block_type(block)
-        print(f"Block type: {block_type}")
-        print(block)
         block = format_block(block, block_type)
         text_nodes = text_to_textnodes(block)
         inline_nodes = []
