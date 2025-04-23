@@ -182,8 +182,7 @@ def format_others(md: str) -> str:
     for line in lines:
         line = line.strip()
         new_lines.append(line)
-    # md = md.replace("\n", "\\n")
-    return "\\n".join(new_lines)
+    return "".join(new_lines)
 
 
 def markdown_to_blocks(markdown: str | None) -> list[str]:
@@ -287,14 +286,19 @@ def markdown_to_html_node(md: str) -> HTMLNode:
     # put LeafNodes (inline) into ParentNode (block)
     # put ParentNode (block) into HTMLNode (document)
     # return a single parent HTMLNode
+    # convert md to blocks
     blocks = markdown_to_blocks(md)
     block_nodes = []
     for block in blocks:
+        # get block type
         block_type = block_to_block_type(block)
+        # format block based on block type
         block = format_block(block, block_type)
+        # convert block to text node based on block type
         text_nodes = text_to_textnodes(block)
         inline_nodes = []
         for text_node in text_nodes:
+            # convert text node to html node
             leaf_node = text_node_to_html_leaf_node(text_node)
             inline_nodes.append(leaf_node)
 
@@ -306,17 +310,11 @@ def markdown_to_html_node(md: str) -> HTMLNode:
 
 if __name__ == "__main__":
     md = """
-        This is **bolded** paragraph
-        text in a p
-        tag here
+            ```
+    This is text that _should_ remain 
+    the **same** even with inline stuff
+    ```
 
-        This is another paragraph with _italic_ text and `code` here  
-        new line here
-
-        ```
-        new line here
-        new line again
-        ```
         """
     node = markdown_to_html_node(md)
     html = node.to_html()
