@@ -1,8 +1,8 @@
 import re
-from htmlblock import BlockType
-from textnode import TextType
-from htmlnode import LeafNode, HTMLNode, ParentNode
-from textnode import TextNode
+from src.htmlblock import BlockType
+from src.textnode import TextType
+from src.htmlnode import LeafNode, HTMLNode, ParentNode
+from src.textnode import TextNode
 
 DELIMITER_TO_TEXTTYPE_MAPPING = {
     "`": TextType.CODE,
