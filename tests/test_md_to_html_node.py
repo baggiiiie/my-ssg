@@ -1,6 +1,6 @@
 import unittest
 
-from src.utils import markdown_to_html_node
+from src.utils.utils import md_to_htmlnode
 
 
 class TestTextNodeToHtmlNode(unittest.TestCase):
@@ -14,7 +14,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
 
     """
 
-        node = markdown_to_html_node(md)
+        node = md_to_htmlnode(md)
         html = node.to_html()
         expected = "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>"
         self.assertEqual(
@@ -31,7 +31,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
     ```
     """
 
-        node = markdown_to_html_node(md)
+        node = md_to_htmlnode(md)
         html = node.to_html()
         self.assertEqual(
             html,

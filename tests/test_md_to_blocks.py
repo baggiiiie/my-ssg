@@ -1,6 +1,6 @@
 import unittest
 
-from src.utils import markdown_to_blocks
+from src.utils.str_utils import md_to_blocks
 
 
 class TestTextNodeToHtmlNode(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
     This is another paragraph with _italic_ text and `code` here  
     This is the same paragraph on a new line
     """
-        blocks = markdown_to_blocks(md)
+        blocks = md_to_blocks(md)
         self.assertEqual(
             blocks,
             [
@@ -29,7 +29,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
         This is another paragraph with _italic_ text and `code` here
 
         """
-        blocks = markdown_to_blocks(md)
+        blocks = md_to_blocks(md)
         self.assertEqual(
             blocks,
             [
@@ -49,7 +49,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
 
 
         """
-        blocks = markdown_to_blocks(md)
+        blocks = md_to_blocks(md)
         self.assertEqual(
             blocks,
             [
