@@ -33,7 +33,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
 
         node = md_to_htmlnode(md)
         html = node.to_html()
-        expected = r"<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre></div>"
+        expected = r"<div><pre><code>This is text that _should_ remain<br>the **same** even with inline stuff</code></pre></div>"
         self.assertEqual(
             html,
             expected,
@@ -65,7 +65,33 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
 
         node = md_to_htmlnode(md)
         html = node.to_html()
-        expected = r"<div><blockquote>quote line 1 with trailing spaces\nquote line 2</blockquote></div>"
+        expected = r"<div><blockquote>quote line 1 with trailing spaces<br>quote line 2</blockquote></div>"
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )
+
+    def test_all(self):
+        md = """
+    this is a paragraph with trailing spaces  
+    **new line here**
+    _same line_
+
+    > quote line 1 with trailing spaces  
+    > quote line 2 
+
+    ```
+    code block **bolded**
+    ```
+
+    1. list item 1  
+    2. item 2
+    """
+
+        node = md_to_htmlnode(md)
+        html = node.to_html()
+        expected = """<div><p>this is a paragraph with trailing spaces<br><b>new line here</b> <i>same line</i></p><blockquote>quote line 1 with trailing spaces<br>quote line 2</blockquote><pre><code>code block **bolded**</code></pre><ol><li>list item 1</li><li> item 2</li></ol></div>""".strip()
         self.assertEqual(
             html,
             expected,

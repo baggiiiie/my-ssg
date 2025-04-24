@@ -10,13 +10,13 @@ def md_to_htmlnode(md: str) -> HTMLNode:
     block_nodes = []
     for block in blocks:
         block_type = get_block_type(block)
-        block = format_block(block, block_type)
+        formatted_block = format_block(block, block_type)
         parent_nodes = []
         if block_type == BlockType.CODE:
-            leaf_node = LeafNode(tag="code", value=block)
-            block_nodes = [ParentNode(tag=block_type.value, children=[leaf_node])]
-            break
-        for line in block.split("\n"):
+            leaf_node = LeafNode(tag="code", value=formatted_block)
+            block_nodes.append(ParentNode(tag=block_type.value, children=[leaf_node]))
+            continue
+        for line in formatted_block.split("\n"):
             inline_textnodes = str_to_textnodes(line)
             children_nodes = []
             for inline_textnode in inline_textnodes:
@@ -33,5 +33,4 @@ def md_to_htmlnode(md: str) -> HTMLNode:
         parent_node = ParentNode(tag=block_type.value, children=parent_nodes)
         block_nodes.append(parent_node)
 
-    leaf_node = HTMLNode(tag="div", children=block_nodes)
-    return leaf_node
+    return HTMLNode(tag="div", children=block_nodes)
