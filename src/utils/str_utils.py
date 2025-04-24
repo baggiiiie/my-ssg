@@ -42,14 +42,7 @@ def split_nodes_delimiter(
 def md_to_blocks(markdown: str | None) -> list[str]:
     if not markdown:
         return []
-    # new_blocks = []
     return markdown.strip().split("\n\n")
-    # for block in blocks:
-    #     if not block or block.isspace():
-    #         continue
-    #     new_block = format_paragraph(block)
-    #     new_blocks.append(new_block.strip())
-    # return new_blocks
 
 
 # NOTE: this is only used in UT for now

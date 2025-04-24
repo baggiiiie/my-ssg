@@ -8,16 +8,17 @@ class HTMLNode:
     ):
         self.tag = tag
         self.value = value
-        self.children = children if children is not None else []
-        self.props = props if props is not None else {}
+        self.children = children if children else []
+        self.props = props if props else {}
 
     def to_html(self) -> str:
         html_text = f"<{self.tag}{self.props_to_html()}>" if self.tag else ""
 
-        for child in self.children:
-            if not isinstance(child, HTMLNode):
-                raise TypeError("ParentNode's children must be HTMLNode instances")
-            html_text += child.to_html()
+        if self.children:
+            for child in self.children:
+                if not isinstance(child, HTMLNode):
+                    raise TypeError("ParentNode's children must be HTMLNode instances")
+                html_text += child.to_html()
 
         html_text += f"</{self.tag}>" if self.tag else ""
         return html_text.replace("\\n", "<br>")
@@ -35,8 +36,8 @@ class HTMLNode:
 class LeafNode(HTMLNode):
     def __init__(
         self,
-        tag: str | None = None,
-        value: str | None = None,
+        tag: str = "",
+        value: str = "",
         props: dict | None = None,
     ):
         super().__init__(tag=tag, value=value, children=None, props=props)
