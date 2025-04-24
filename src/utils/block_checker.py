@@ -54,19 +54,17 @@ def check_ordered_list(md: str) -> bool:
     return True
 
 
-BLOCK_TYPE_CHECKER = {
-    BlockType.HEADING: check_heading,
-    BlockType.CODE: check_code_block,
-    BlockType.QUOTE: check_quote_block,
-    BlockType.ORDERED_LIST: check_ordered_list,
-    BlockType.UNORDERED_LIST: check_unordered_list,
-}
-
-
 def get_block_type(markdown: str | None) -> BlockType:
     # takes in a single block of markdown text, return BlockType
     if not markdown:
         return BlockType.PARAGRAPH
+    BLOCK_TYPE_CHECKER = {
+        BlockType.HEADING: check_heading,
+        BlockType.CODE: check_code_block,
+        BlockType.QUOTE: check_quote_block,
+        BlockType.ORDERED_LIST: check_ordered_list,
+        BlockType.UNORDERED_LIST: check_unordered_list,
+    }
     for block_type, checker in BLOCK_TYPE_CHECKER.items():
         if checker(markdown.strip()):
             return block_type

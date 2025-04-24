@@ -21,18 +21,7 @@ def textnode_to_leafnode(text_node: TextNode) -> LeafNode:
         raise ValueError("Invalid text type")
 
 
-def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
-    text_type = TextType.IMAGE
-    new_nodes = []
-    for node in old_nodes:
-        new_node = split_node(node, text_type)
-        new_nodes.extend(new_node)
-
-    return new_nodes
-
-
-def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
-    text_type = TextType.LINK
+def split_nodes_into_img_link(old_nodes: list[TextNode], text_type) -> list[TextNode]:
     new_nodes = []
     for node in old_nodes:
         new_node = split_node(node, text_type)
@@ -55,8 +44,8 @@ def str_to_textnodes(text: str | None) -> list[TextNode]:
     original = TextNode(text, TextType.TEXT)
     # NOTE: i don't need so many variables, but just keep them for now
     after_delimiter = split_nodes_delimiters([original])
-    after_link = split_nodes_link(after_delimiter)
-    after_image = split_nodes_image(after_link)
+    after_link = split_nodes_into_img_link(after_delimiter, TextType.LINK)
+    after_image = split_nodes_into_img_link(after_link, TextType.IMAGE)
 
     return after_image
 

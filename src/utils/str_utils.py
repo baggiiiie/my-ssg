@@ -1,11 +1,9 @@
-import re
 from src.htmlblock import BlockType
 from src.nodes.textnode import TextType
 from src.nodes.textnode import TextNode
 
 DELIMITER_TO_TEXTTYPE_MAPPING = {
     "`": TextType.CODE,
-    # i think i'll need to put BOLD before ITALIC?
     "**": TextType.BOLD,
     "__": TextType.BOLD,
     "*": TextType.ITALIC,
@@ -17,7 +15,6 @@ def split_nodes_delimiter(
     old_nodes: list, delimiter: str, text_type: TextType
 ) -> list[TextNode]:
     # TODO: include nested delimiter, meaning we should have parent and children TextNode?
-    # NOTE: TextNode could be broken into multiple TextNode
     new_nodes = []
     for node in old_nodes:
         if not isinstance(node, TextNode):
@@ -26,12 +23,11 @@ def split_nodes_delimiter(
         # TODO: deal with no closing delimiter
         contents = node.text.split(delimiter)
         # even number of length indicates no closing delimiter
-        if contents and len(contents) % 2 == 0:
+        if len(contents) % 2 == 0:
             raise Exception("No closing delimiter")
         for index, content in enumerate(contents):
             # if index is odd, it's inside the delimiter
             if index % 2 == 0:
-                # outside of the delimiter might not be text?
                 if content:
                     new_nodes.append(TextNode(content, node.text_type))
             else:
@@ -43,22 +39,6 @@ def md_to_blocks(markdown: str | None) -> list[str]:
     if not markdown:
         return []
     return markdown.strip().split("\n\n")
-
-
-# NOTE: this is only used in UT for now
-def extract_markdown_images(text: str) -> list[tuple]:
-    # Returning [(anchor, URL)]
-    image_pattern = r"!\[([^\[\]]*)\]\(([^\(\)]*)\)"
-    matches = re.findall(image_pattern, text)
-    return matches
-
-
-# NOTE: this is only used in UT for now
-def extract_markdown_links(text: str) -> list[tuple]:
-    # Returning [(anchor, URL)]
-    link_pattern = r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)"
-    matches = re.findall(link_pattern, text)
-    return matches
 
 
 def trailing_spaces_to_new_line(lines: list) -> str:
@@ -134,15 +114,14 @@ def format_code(md: str) -> str:
 def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str:
     if not block:
         return ""
+    BLOCK_FORMAT_HELPER = {
+        BlockType.PARAGRAPH: format_paragraph,
+        BlockType.CODE: format_code,
+        BlockType.QUOTE: format_quote,
+        BlockType.UNORDERED_LIST: format_list,
+        BlockType.ORDERED_LIST: format_list,
+    }
+    format_func = BLOCK_FORMAT_HELPER.get(block_type, format_others)
+    block = format_func(block).strip()
 
-    if block_type == BlockType.PARAGRAPH:
-        block = format_paragraph(block)
-    elif block_type == BlockType.CODE:
-        block = format_code(block)
-    elif block_type == BlockType.QUOTE:
-        block = format_quote(block)
-    elif block_type in (BlockType.UNORDERED_LIST, BlockType.ORDERED_LIST):
-        block = format_list(block)
-    else:
-        block = format_others(block)
-    return block.strip()
+    return block or ""

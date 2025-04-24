@@ -1,12 +1,8 @@
 import unittest
 
-from src.utils.node_utils import split_nodes_delimiters, split_nodes_image, split_nodes_link
+from src.utils.node_utils import split_nodes_delimiters, split_nodes_into_img_link
 from src.nodes.textnode import TextNode, TextType
-from src.utils.str_utils import (
-    split_nodes_delimiter,
-    extract_markdown_images,
-    extract_markdown_links,
-)
+from src.utils.str_utils import split_nodes_delimiter
 
 
 class TestUtils(unittest.TestCase):
@@ -102,48 +98,13 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(len(new_nodes), 5, f"new nodes are {new_nodes}")
         self.assertEqual(new_nodes, expected, f"new nodes are {new_nodes}")
 
-    # TODO: Need to add support for mixed delimiters
-    # def test_split_textnodes_multiple_mixed(self):
-    #     node = TextNode("This is *text with* a `code block` **word**", TextType.TEXT)
-    #     new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-    #     expected = [
-    #         TextNode("This is ", TextType.TEXT),
-    #         TextNode("text with", TextType.ITALIC),
-    #         TextNode(" a ", TextType.TEXT),
-    #         TextNode("code block", TextType.CODE),
-    #         TextNode(" ", TextType.TEXT),
-    #         TextNode("word", TextType.BOLD),
-    #     ]
-    #     self.assertEqual(new_nodes, expected)
-
-    def test_extract_markdown_images(self):
-        matches = extract_markdown_images(
-            "this is text with an ![image](https://i.imgur.com/zjjcjkz.png)"
-        )
-        self.assertListEqual([("image", "https://i.imgur.com/zjjcjkz.png")], matches)
-
-    def test_extract_markdown_links(self):
-        matches = extract_markdown_links(
-            "this is text with an ![image](https://i.imgur.com/zjjcjkz.png)"
-        )
-        self.assertListEqual([], matches)
-
-    def test_extract_markdown_images_with_links(self):
-        text = "this is [link](test) text with an ![image](https://i.imgur.com/zjjcjkz.png)"
-        img_matches = extract_markdown_images(text)
-        link_matches = extract_markdown_links(text)
-        self.assertListEqual(
-            [("image", "https://i.imgur.com/zjjcjkz.png")], img_matches
-        )
-        self.assertListEqual([("link", "test")], link_matches)
-
     def test_split_node_link(self):
         node = TextNode(
             "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
             TextType.TEXT,
         )
 
-        new_nodes = split_nodes_link([node])
+        new_nodes = split_nodes_into_img_link([node], TextType.LINK)
         expected = [
             TextNode("This is text with a link ", TextType.TEXT),
             TextNode("to boot dev", TextType.LINK, "https://www.boot.dev"),
@@ -159,7 +120,7 @@ class TestUtils(unittest.TestCase):
             "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
             TextType.TEXT,
         )
-        new_nodes = split_nodes_image([node])
+        new_nodes = split_nodes_into_img_link([node], TextType.IMAGE)
         self.assertListEqual(
             [
                 TextNode("This is text with an ", TextType.TEXT),
