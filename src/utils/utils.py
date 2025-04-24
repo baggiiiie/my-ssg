@@ -1,4 +1,4 @@
-from src.htmlblock import BLOCK_CHILDREN_MAP
+from src.htmlblock import BLOCK_CHILDREN_MAP, BlockType
 from src.utils.block_checker import get_block_type
 from src.nodes.htmlnode import HTMLNode, LeafNode, ParentNode
 from src.utils.node_utils import str_to_textnodes, textnode_to_leafnode
@@ -12,26 +12,22 @@ def md_to_htmlnode(md: str) -> HTMLNode:
         block_type = get_block_type(block)
         block = format_block(block, block_type)
         parent_nodes = []
+        if block_type == BlockType.CODE:
+            leaf_node = LeafNode(tag="code", value=block)
+            block_nodes = [ParentNode(tag=block_type.value, children=[leaf_node])]
+            break
         for line in block.split("\n"):
             inline_textnodes = str_to_textnodes(line)
             children_nodes = []
             for inline_textnode in inline_textnodes:
                 leaf_node = textnode_to_leafnode(inline_textnode)
-                # __AUTO_GENERATED_PRINT_VAR_START__
-                print(
-                    f"md_to_htmlnode leaf_node: {str(leaf_node)}"
-                )  # __AUTO_GENERATED_PRINT_VAR_END__
                 children_nodes.append(leaf_node)
             if BLOCK_CHILDREN_MAP[block_type]:
                 parent_node = ParentNode(
                     tag=BLOCK_CHILDREN_MAP[block_type], children=children_nodes
                 )
             else:
-                parent_node = LeafNode(tag=None, value=block)
-            # __AUTO_GENERATED_PRINT_VAR_START__
-            print(
-                f"md_to_htmlnode parent_node: {str(parent_node)}"
-            )  # __AUTO_GENERATED_PRINT_VAR_END__
+                parent_node = HTMLNode(tag=None, children=children_nodes)
             parent_nodes.append(parent_node)
 
         parent_node = ParentNode(tag=block_type.value, children=parent_nodes)
