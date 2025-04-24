@@ -17,13 +17,21 @@ def md_to_htmlnode(md: str) -> HTMLNode:
             children_nodes = []
             for inline_textnode in inline_textnodes:
                 leaf_node = textnode_to_leafnode(inline_textnode)
+                # __AUTO_GENERATED_PRINT_VAR_START__
+                print(
+                    f"md_to_htmlnode leaf_node: {str(leaf_node)}"
+                )  # __AUTO_GENERATED_PRINT_VAR_END__
                 children_nodes.append(leaf_node)
             if BLOCK_CHILDREN_MAP[block_type]:
                 parent_node = ParentNode(
                     tag=BLOCK_CHILDREN_MAP[block_type], children=children_nodes
                 )
             else:
-                parent_node = LeafNode(tag=None, value=line)
+                parent_node = LeafNode(tag=None, value=block)
+            # __AUTO_GENERATED_PRINT_VAR_START__
+            print(
+                f"md_to_htmlnode parent_node: {str(parent_node)}"
+            )  # __AUTO_GENERATED_PRINT_VAR_END__
             parent_nodes.append(parent_node)
 
         parent_node = ParentNode(tag=block_type.value, children=parent_nodes)

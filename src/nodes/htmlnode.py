@@ -29,7 +29,7 @@ class HTMLNode:
         return html_text
 
     def __repr__(self) -> str:
-        return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
+        return f"{self.__class__.__name__}({self.tag}, {self.value}, {self.children}, {self.props})"
 
 
 class LeafNode(HTMLNode):
@@ -47,6 +47,10 @@ class LeafNode(HTMLNode):
         html_text = f"<{self.tag}{self.props_to_html()}>" if self.tag else ""
         html_text += f"{self.value}"
         html_text += f"</{self.tag}>" if self.tag else ""
+        # __AUTO_GENERATED_PRINT_VAR_START__
+        print(
+            f"LeafNode#to_html html_text: {str(html_text)}"
+        )  # __AUTO_GENERATED_PRINT_VAR_END__
         return html_text
 
 

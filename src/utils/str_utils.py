@@ -95,13 +95,12 @@ def format_paragraph(block: str | None) -> str:
 
 
 def format_list(md: str) -> str:
-    # we wanna remove `> ` at the start of lines
     new_lines = []
     lines = md.split("\n")
     for line in lines:
-        line = line[2:]
+        line = line.strip()[2:]
         new_lines.append(line)
-    return trailing_spaces_to_new_line(new_lines)
+    return "\n".join(new_lines)
 
 
 def format_quote(md: str) -> str:
@@ -149,8 +148,8 @@ def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str:
         block = format_code(block)
     elif block_type == BlockType.QUOTE:
         block = format_quote(block)
-    elif block_type == BlockType.UNORDERED_LIST:
-        ...
+    elif block_type in (BlockType.UNORDERED_LIST, BlockType.ORDERED_LIST):
+        block = format_list(block)
     else:
         block = format_others(block)
     return block.strip()
