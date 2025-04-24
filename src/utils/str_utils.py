@@ -106,22 +106,25 @@ def format_code(md: str) -> str:
     # format the input md string
     # if it's a new line, it's a new line
     # no trailing spaces logic
-    lines = md.split("\n")[1:-2]
+    lines = md.split("\n")[1:-1]
     new_lines = []
     for line in lines:
         line = line.strip()
         new_lines.append(line)
-    formatted_line = "```" + "\n".join(new_lines) + "```"
+    formatted_line = "\\n".join(new_lines)
     return formatted_line
 
 
 def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str | None:
     if not block:
         return None
+
     if block_type == BlockType.PARAGRAPH:
         block = format_paragraph(block)
     elif block_type == BlockType.CODE:
         block = format_code(block)
+    elif block_type == BlockType.UNORDERED_LIST:
+        ...
     else:
         block = format_others(block)
     return block.strip()

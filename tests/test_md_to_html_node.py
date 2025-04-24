@@ -33,7 +33,9 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
 
         node = md_to_htmlnode(md)
         html = node.to_html()
+        expected = r"<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre></div>"
         self.assertEqual(
             html,
-            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+            expected,
+            f"\nhtml text is: {html}\nexpected is {expected}",
         )
