@@ -26,7 +26,7 @@ def split_nodes_delimiter(
         # TODO: deal with no closing delimiter
         contents = node.text.split(delimiter)
         # even number of length indicates no closing delimiter
-        if len(contents) % 2 == 0:
+        if contents and len(contents) % 2 == 0:
             raise Exception("No closing delimiter")
         for index, content in enumerate(contents):
             # if index is odd, it's inside the delimiter

@@ -6,7 +6,7 @@ from src.utils.str_utils import DELIMITER_TO_TEXTTYPE_MAPPING, split_nodes_delim
 
 def textnode_to_leafnode(text_node: TextNode) -> LeafNode:
     if text_node.text_type == TextType.TEXT:
-        return LeafNode(None, text_node.text)
+        return LeafNode("", text_node.text)
     elif text_node.text_type == TextType.BOLD:
         return LeafNode("b", text_node.text)
     elif text_node.text_type == TextType.ITALIC:

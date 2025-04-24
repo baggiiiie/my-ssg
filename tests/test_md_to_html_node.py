@@ -97,3 +97,17 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
             expected,
             f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
         )
+
+    def test_link_and_image(self):
+        md = """
+        this is a [link](https://test) and an ![img](img-link)
+        """
+
+        node = md_to_htmlnode(md)
+        html = node.to_html()
+        expected = '<div><p>this is a <a href="https://test">link</a> and an <img src="img-link" alt="img"></img></p></div>'
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )
