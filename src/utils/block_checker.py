@@ -24,7 +24,7 @@ def check_quote_block(md: str) -> bool:
     regex = r"^> .*"
     lines = md.split("\n")
     for line in lines:
-        if not re.match(regex, line):
+        if not re.match(regex, line.strip()):
             return False
     return True
 
@@ -33,7 +33,7 @@ def check_unordered_list(md: str) -> bool:
     regex = r"^[-+*] .*"
     lines = md.split("\n")
     for line in lines:
-        if not re.match(regex, line):
+        if not re.match(regex, line.strip()):
             return False
     return True
 
@@ -43,7 +43,7 @@ def check_ordered_list(md: str) -> bool:
     lines = md.split("\n")
     index = 1
     for line in lines:
-        match = re.match(regex, line)
+        match = re.match(regex, line.strip())
         if not match:
             return False
         line_number = match.group(0).split(".", 2)[0]
