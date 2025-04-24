@@ -68,11 +68,7 @@ def extract_markdown_links(text: str) -> list[tuple]:
     return matches
 
 
-def format_paragraph(block: str | None) -> str:
-    # paragraphs: deal with trailing spaces
-    if not block:
-        return ""
-    lines = block.split("\n")
+def trailing_spaces_to_new_line(lines: list) -> str:
     new_block = []
     current_line = ""
     for line in lines:
@@ -90,6 +86,35 @@ def format_paragraph(block: str | None) -> str:
     return "".join(new_block)
 
 
+def format_paragraph(block: str | None) -> str:
+    # paragraphs: deal with trailing spaces
+    if not block:
+        return ""
+    lines = block.split("\n")
+    return trailing_spaces_to_new_line(lines)
+
+
+def format_list(md: str) -> str:
+    # we wanna remove `> ` at the start of lines
+    new_lines = []
+    lines = md.split("\n")
+    for line in lines:
+        line = line[2:]
+        new_lines.append(line)
+    return trailing_spaces_to_new_line(new_lines)
+
+
+def format_quote(md: str) -> str:
+    # we wanna remove `> ` at the start of lines
+    new_lines = []
+    lines = md.split("\n")
+    for line in lines:
+        line = line.lstrip()
+        line = line[2:]
+        new_lines.append(line)
+    return trailing_spaces_to_new_line(new_lines)
+
+
 def format_others(md: str) -> str:
     # format the input md string
     # if it's a new line, it's a new line
@@ -99,7 +124,7 @@ def format_others(md: str) -> str:
     for line in lines:
         line = line.strip()
         new_lines.append(line)
-    return "\n".join(new_lines)
+    return "\\n".join(new_lines)
 
 
 def format_code(md: str) -> str:
@@ -111,18 +136,19 @@ def format_code(md: str) -> str:
     for line in lines:
         line = line.strip()
         new_lines.append(line)
-    formatted_line = "\\n".join(new_lines)
-    return formatted_line
+    return "\\n".join(new_lines)
 
 
-def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str | None:
+def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str:
     if not block:
-        return None
+        return ""
 
     if block_type == BlockType.PARAGRAPH:
         block = format_paragraph(block)
     elif block_type == BlockType.CODE:
         block = format_code(block)
+    elif block_type == BlockType.QUOTE:
+        block = format_quote(block)
     elif block_type == BlockType.UNORDERED_LIST:
         ...
     else:

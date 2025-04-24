@@ -39,3 +39,35 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
             expected,
             f"\nhtml text is: {html}\nexpected is {expected}",
         )
+
+    def test_unordered_list(self):
+        md = """
+    - item 1 with trailing spaces  
+    - item 2
+    """
+
+        node = md_to_htmlnode(md)
+        html = node.to_html()
+        expected = (
+            r"<div><ul><li>item 1 with trailing spaces</li><li>item 2</li></ul></div>"
+        )
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )
+
+    def test_quote(self):
+        md = """
+    > quote line 1 with trailing spaces  
+    > quote line 2 
+    """
+
+        node = md_to_htmlnode(md)
+        html = node.to_html()
+        expected = r"<div><blockquote>quote line 1 with trailing spaces\nquote line 2</blockquote></div>"
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )
