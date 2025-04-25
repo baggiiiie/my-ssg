@@ -111,11 +111,17 @@ def format_code(md: str) -> str:
     return "\\n".join(new_lines)
 
 
+def format_heading(md: str) -> str:
+    lines = md.split(" ", 2)[1]
+    return lines
+
+
 def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str:
     if not block:
         return ""
     BLOCK_FORMAT_HELPER = {
         BlockType.PARAGRAPH: format_paragraph,
+        BlockType.HEADING: format_heading,
         BlockType.CODE: format_code,
         BlockType.QUOTE: format_quote,
         BlockType.UNORDERED_LIST: format_list,
