@@ -27,8 +27,10 @@ class MarkdownParser:
 
     def inline_parse(self, md: str) -> str:
         # deal with inline text
-
-        ...
+        for text_type, regex in INLINE_REGEX_PATTERNS.items():
+            md = regex[0].sub(regex[1], md)
+            return md
+        return ""
 
     def line_parse(self, md: str) -> str:
         # from md to html
