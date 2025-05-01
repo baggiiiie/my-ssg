@@ -1,8 +1,10 @@
+import os
+import shutil
 from src.htmlblock import BLOCK_CHILDREN_MAP, BlockType
 from src.utils.block_checker import get_block_type
 from src.nodes.htmlnode import HTMLNode, LeafNode, ParentNode
 from src.utils.node_utils import str_to_textnodes, textnode_to_leafnode
-from src.utils.str_utils import format_block, md_to_blocks
+from src.utils.str_utils import format_block, md_to_blocks, extract_title
 
 
 def md_to_htmlnode(md: str) -> HTMLNode:
@@ -34,3 +36,26 @@ def md_to_htmlnode(md: str) -> HTMLNode:
         block_nodes.append(parent_node)
 
     return HTMLNode(tag="div", children=block_nodes)
+
+
+TEMPLATE_PATH = "template.html"
+
+
+def generate_page(
+    src_path: str, dst_path: str, template_path: str = TEMPLATE_PATH
+) -> None:
+    src_file = open(src_path, "r").read()
+    template_file = open(template_path, "r").read()
+    src_html_str = md_to_htmlnode(src_file).to_html()
+    title = extract_title(src_file)
+    final_html_str = template_file.replace("{{ Content }}", src_html_str).replace(
+        "{{ Title }}", title
+    )
+    if os.path.exists(dst_path):
+        print(f"{dst_path} already exists, removing it")
+        ...
+    os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+    with open(dst_path, "w") as f:
+        print(f"abs path is {os.path.abspath(dst_path)}")
+        print(f"Writing to {dst_path}")
+        f.write(final_html_str)

@@ -131,3 +131,11 @@ def format_block(block: str | None, block_type=BlockType.PARAGRAPH) -> str:
     block = format_func(block).strip()
 
     return block or ""
+
+
+def extract_title(md: str) -> str:
+    # im only gonna get the first line to use it as title
+    title = md.split("\n")[0]
+    if title.startswith("# "):
+        title = title[2:]
+    return title
