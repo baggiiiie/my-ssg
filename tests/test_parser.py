@@ -62,3 +62,9 @@ class TestInlineParser(unittest.TestCase):
         result = MarkdownParser().inline_parser(md)
         expected = "this is <code>__non-bolded__ code</code>"
         self.assertEqual(result, expected)
+
+    def test_inline_parser_normal_nested_3(self):
+        md = "this is *`code`*"
+        result = MarkdownParser().inline_parser(md)
+        expected = "this is <i><code>code</code></i>"
+        self.assertEqual(result, expected)
