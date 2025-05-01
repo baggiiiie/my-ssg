@@ -25,8 +25,8 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
     def test_codeblock(self):
         md = """
     ```
-    This is text that _should_ remain
-    the **same** even with inline stuff
+This is text that _should_ remain
+the **same** even with inline stuff
     ```
     """
 
