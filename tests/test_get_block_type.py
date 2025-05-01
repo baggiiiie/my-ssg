@@ -1,7 +1,7 @@
 import unittest
 
-from src.htmlblock import BlockType
-from src.utils.block_checker import get_block_type
+from htmlblock import BlockType
+from utils.block_checker import get_block_type
 
 
 class TestBlockToBlockType(unittest.TestCase):

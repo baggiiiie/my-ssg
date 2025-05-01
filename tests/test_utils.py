@@ -1,8 +1,8 @@
 import unittest
 
-from src.utils.node_utils import split_nodes_delimiters, split_nodes_into_img_link
-from src.nodes.textnode import TextNode, TextType
-from src.utils.str_utils import split_nodes_delimiter
+from utils.node_utils import split_nodes_delimiters, split_nodes_into_img_link
+from nodes.textnode import TextNode, TextType
+from utils.str_utils import split_nodes_delimiter
 
 
 class TestUtils(unittest.TestCase):

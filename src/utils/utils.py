@@ -1,9 +1,9 @@
 import os
-from src.htmlblock import BLOCK_CHILDREN_MAP, BlockType
-from src.utils.block_checker import get_block_type
-from src.nodes.htmlnode import HTMLNode, LeafNode, ParentNode
-from src.utils.node_utils import str_to_textnodes, textnode_to_leafnode
-from src.utils.str_utils import format_block, md_to_blocks, extract_title
+from htmlblock import BLOCK_CHILDREN_MAP, BlockType
+from utils.block_checker import get_block_type
+from nodes.htmlnode import HTMLNode, LeafNode, ParentNode
+from utils.node_utils import str_to_textnodes, textnode_to_leafnode
+from utils.str_utils import format_block, md_to_blocks, extract_title
 
 
 def md_to_htmlnode(md: str) -> HTMLNode:

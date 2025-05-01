@@ -1,6 +1,6 @@
-from src.htmlblock import BlockType
-from src.nodes.textnode import TextType
-from src.nodes.textnode import TextNode
+from htmlblock import BlockType
+from nodes.textnode import TextType
+from nodes.textnode import TextNode
 
 DELIMITER_TO_TEXTTYPE_MAPPING = {
     "`": TextType.CODE,

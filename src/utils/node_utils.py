@@ -1,7 +1,7 @@
 import re
-from src.nodes.htmlnode import LeafNode
-from src.nodes.textnode import TextNode, TextType
-from src.utils.str_utils import DELIMITER_TO_TEXTTYPE_MAPPING, split_nodes_delimiter
+from nodes.htmlnode import LeafNode
+from nodes.textnode import TextNode, TextType
+from utils.str_utils import DELIMITER_TO_TEXTTYPE_MAPPING, split_nodes_delimiter
 
 
 def textnode_to_leafnode(text_node: TextNode) -> LeafNode:

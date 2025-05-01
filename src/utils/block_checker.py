@@ -1,6 +1,6 @@
 import re
 
-from src.htmlblock import BlockType
+from htmlblock import BlockType
 
 
 def check_heading(md: str) -> bool:
