@@ -106,7 +106,6 @@ def format_code(md: str) -> str:
     lines = md.split("\n")[1:-1]
     new_lines = []
     for line in lines:
-        line = line.strip()
         new_lines.append(line)
     return "\\n".join(new_lines)
 
