@@ -49,7 +49,7 @@ def trailing_spaces_to_new_line(lines: list) -> str:
             continue
         if line.endswith("  "):
             line = line.strip()
-            current_line += line + "\\n"
+            current_line += line + r"\n"
             continue
 
         # line doesn't end with 2 or more spaces, append a space and append next line
@@ -96,7 +96,7 @@ def format_others(md: str) -> str:
     for line in lines:
         line = line.strip()
         new_lines.append(line)
-    return "\\n".join(new_lines)
+    return r"\n".join(new_lines)
 
 
 def format_code(md: str) -> str:
@@ -107,7 +107,7 @@ def format_code(md: str) -> str:
     new_lines = []
     for line in lines:
         new_lines.append(line)
-    return "\\n".join(new_lines)
+    return r"\n".join(new_lines)
 
 
 def format_heading(md: str) -> str:

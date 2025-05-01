@@ -142,3 +142,34 @@ the **same** even with inline stuff
             expected,
             f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
         )
+
+    def test_code_in_code_block(self):
+        md = r"""
+        ```
+        code \n format
+        ```
+        """.strip()
+        html = md_to_htmlnode(md).to_html()
+        expected = """
+            <div><pre><code>code \n format
+            </code></pre></div>"
+            """
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )
+
+    def test_code_in_paragraph(self):
+        md = r"""
+        this is a `code\nblock` in a paragraph
+        """
+        html = md_to_htmlnode(md).to_html()
+        expected = (
+            r"<div><p>this is a <code>code\nblock</code> in a paragraph</p></div>"
+        )
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )

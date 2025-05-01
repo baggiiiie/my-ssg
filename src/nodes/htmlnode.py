@@ -21,7 +21,10 @@ class HTMLNode:
                 html_text += child.to_html()
 
         html_text += f"</{self.tag}>" if self.tag else ""
-        return html_text.replace("\\n", "<br>")
+        if self.tag != "pre":
+            # Replace \n with <br> for all tags except code
+            html_text = html_text.replace(r"\n", "<br>")
+        return html_text
 
     def props_to_html(self) -> str:
         html_text = ""
@@ -48,7 +51,9 @@ class LeafNode(HTMLNode):
         html_text = f"<{self.tag}{self.props_to_html()}>" if self.tag else ""
         html_text += f"{self.value}"
         html_text += f"</{self.tag}>" if self.tag else ""
-        return html_text.replace("\\n", "<br>")
+        if self.tag != "code":
+            html_text.replace(r"\n", "<br>")
+        return html_text
 
 
 class ParentNode(HTMLNode):
