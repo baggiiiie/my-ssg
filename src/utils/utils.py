@@ -61,3 +61,22 @@ def generate_page(
         print(f"abs path is {os.path.abspath(dst_html_path)}")
         print(f"Writing to {dst_html_path}")
         f.write(final_html_str)
+
+
+def generate_pages(
+    src_dir: str, dst_dir: str, template_path: str = TEMPLATE_PATH
+) -> None:
+    dir_content = os.listdir(src_dir)
+    for content in dir_content:
+        content_path = os.path.join(src_dir, content)
+        if os.path.isdir(content_path):
+            generate_pages(
+                os.path.join(src_dir, content),
+                os.path.join(dst_dir, content),
+            )
+        elif content.endswith(".md"):
+            generate_page(
+                src_md_path=content_path,
+                dst_html_path=os.path.join(dst_dir, content[:-3] + ".html"),
+                html_template_path=template_path,
+            )
