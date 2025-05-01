@@ -1,10 +1,11 @@
 import os
 import shutil
 
+SRC_PATH = "static"
 DST_PATH = "public"
 
 
-def copy_dir(src_dir: str, dst_dir: str) -> None:
+def copy_dir(src_dir: str = SRC_PATH, dst_dir: str = DST_PATH) -> None:
     def _copy_dir_helper(src_dir: str, dst_dir: str) -> None:
         # list and loop thru all content in src dir
         # if file,
