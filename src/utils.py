@@ -12,7 +12,7 @@ LINE_REGEX = {
 }
 
 INLINE_REGEX = {
-    InlineTextType.INLINE_CODE: (re.compile(r"`([^`]+)`"), r"<code>\1</code>"),
+    InlineTextType.INLINE_CODE: (re.compile(r"`([^`]+)`"), "<code>{}</code>"),
     InlineTextType.LINK: (
         re.compile(r"\[([^\]]+)\]\(([^)]+)\)"),
         r'<a href="\2">\1</a>',

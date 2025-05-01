@@ -1,5 +1,6 @@
+import re
 from htmlblock import BlockType
-from utils import LINE_REGEX_PATTERNS, INLINE_REGEX_PATTERNS
+from utils import LINE_REGEX, INLINE_REGEX
 from type import LineType, InlineTextType
 
 NEW_LINE_CHAR = "{{new_line}}"
@@ -9,28 +10,50 @@ class MarkdownParser:
     def __init__(self): ...
 
     def get_line_type(self, md: str) -> LineType:
-        for line_type, regex in LINE_REGEX_PATTERNS.items():
+        for line_type, regex in LINE_REGEX.items():
             if regex.match(md):
                 return line_type
         return LineType.NONE
 
-    def get_inline_type(self, md: str) -> InlineTextType:
-        for text_type, regex in INLINE_REGEX_PATTERNS.items():
-            if regex.match(md):
-                return text_type
-        return InlineTextType.TEXT
+    # def get_inline_type(self, md: str) -> InlineTextType:
+    #     for text_type, regex in INLINE_REGEX_PATTERNS.items():
+    #         if regex.match(md):
+    #             return text_type
+    #     return InlineTextType.TEXT
 
     def trailing_space_handler(self, md: str) -> str:
         if md.endswith(" "):
             md = md.rstrip() + NEW_LINE_CHAR
         return ""
 
-    def inline_parse(self, md: str) -> str:
+    def inline_parser(self, md: str) -> str:
         # deal with inline text
-        for text_type, regex in INLINE_REGEX_PATTERNS.items():
-            md = regex[0].sub(regex[1], md)
+        INLINE_CODE_PLACE_HOLDER = "${{PLACEHOLDER}}$"
+        inline_code_blocks = []
+        code_match_pattern, code_replace_pattern = INLINE_REGEX[
+            InlineTextType.INLINE_CODE
+        ]
+
+        def inline_code_replace(md: str) -> str:
+            inline_code_blocks.extend(re.findall(code_match_pattern, md))
+            return code_match_pattern.sub(INLINE_CODE_PLACE_HOLDER, md)
+
+        def restore_inline_code(md: str) -> str:
+            for inline_code in inline_code_blocks:
+                md = md.replace(
+                    INLINE_CODE_PLACE_HOLDER,
+                    code_replace_pattern.format(inline_code),
+                    1,
+                )
             return md
-        return ""
+
+        md = inline_code_replace(md)
+        for text_type, regex in INLINE_REGEX.items():
+            match_pattern, repalce_pattern = regex
+            md = match_pattern.sub(repalce_pattern, md)
+        if inline_code_blocks:
+            md = restore_inline_code(md)
+        return md
 
     def line_parse(self, md: str) -> str:
         # from md to html
@@ -50,6 +73,9 @@ class MarkdownParser:
                 ...
                 continue
 
+            if not line:
+                # empty line means new block
+                ...
             line_type = self.get_line_type(line)
             if line_type == LineType.CODE_START:
                 current_block["block_type"] = BlockType.CODE
