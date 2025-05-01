@@ -14,8 +14,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
 
     """
 
-        node = md_to_htmlnode(md)
-        html = node.to_html()
+        html = md_to_htmlnode(md).to_html()
         expected = "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>"
         self.assertEqual(
             html,
@@ -31,8 +30,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
     ```
     """
 
-        node = md_to_htmlnode(md)
-        html = node.to_html()
+        html = md_to_htmlnode(md).to_html()
         expected = r"<div><pre><code>This is text that _should_ remain<br>the **same** even with inline stuff</code></pre></div>"
         self.assertEqual(
             html,
@@ -46,8 +44,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
     - item 2
     """
 
-        node = md_to_htmlnode(md)
-        html = node.to_html()
+        html = md_to_htmlnode(md).to_html()
         expected = (
             r"<div><ul><li>item 1 with trailing spaces</li><li>item 2</li></ul></div>"
         )
@@ -63,8 +60,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
     > quote line 2 
     """
 
-        node = md_to_htmlnode(md)
-        html = node.to_html()
+        html = md_to_htmlnode(md).to_html()
         expected = r"<div><blockquote>quote line 1 with trailing spaces<br>quote line 2</blockquote></div>"
         self.assertEqual(
             html,
@@ -89,8 +85,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
     2. item 2
     """
 
-        node = md_to_htmlnode(md)
-        html = node.to_html()
+        html = md_to_htmlnode(md).to_html()
         expected = """<div><p>this is a paragraph with trailing spaces<br><b>new line here</b> <i>same line</i></p><blockquote>quote line 1 with trailing spaces<br>quote line 2</blockquote><pre><code>code block **bolded**</code></pre><ol><li>list item 1</li><li> item 2</li></ol></div>""".strip()
         self.assertEqual(
             html,
@@ -103,9 +98,45 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
         this is a [link](https://test) and an ![img](img-link)
         """
 
-        node = md_to_htmlnode(md)
-        html = node.to_html()
+        html = md_to_htmlnode(md).to_html()
         expected = '<div><p>this is a <a href="https://test">link</a> and an <img src="img-link" alt="img"></img></p></div>'
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )
+
+    def test_link_and_image_with_list(self):
+        md = """
+        - this is a [link](https://test) and an ![img](img-link)
+        """
+
+        html = md_to_htmlnode(md).to_html()
+        expected = '<div><ul><li>this is a <a href="https://test">link</a> and an <img src="img-link" alt="img"></img></li></ul></div>'
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )
+
+    def test_link_and_image_with_list_2(self):
+        md = """
+        - [link](https://test)
+        """
+        html = md_to_htmlnode(md).to_html()
+        expected = '<div><ul><li><a href="https://test">link</a></li></ul></div>'
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )
+
+    def test_bolded_in_list(self):
+        md = """
+        - **bolded text**
+        """
+        html = md_to_htmlnode(md).to_html()
+        expected = "<div><ul><li><b>bolded text</b></li></ul></div>"
         self.assertEqual(
             html,
             expected,

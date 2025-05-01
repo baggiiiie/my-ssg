@@ -57,3 +57,15 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
                 "        This is another paragraph with _italic_ text and `code` here",
             ],
         )
+
+    def test_markdown_to_blocks_single_text_node(self):
+        md = """
+        - **this is a bolded text**
+        """
+        blocks = md_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "- **this is a bolded text**",
+            ],
+        )
