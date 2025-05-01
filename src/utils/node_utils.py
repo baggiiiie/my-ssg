@@ -82,7 +82,8 @@ def split_node(
         return [old_node]
 
     parts = old_node.text.split(split_pattern.format(anchor, url), 1)
-    node_list.append(TextNode(parts[0], TextType.TEXT))
+    if parts[0]:
+        node_list.append(TextNode(parts[0], TextType.TEXT))
     node_list.append(TextNode(anchor, text_type, url))
     split_node(TextNode(parts[1], TextType.TEXT), text_type, node_list)
     return node_list
