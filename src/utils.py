@@ -1,7 +1,7 @@
 import re
 from type import LineType, InlineTextType
 
-LINE_REGEX_PATTERNS = {
+LINE_REGEX = {
     LineType.HEADING: re.compile(r"^(#{1,6})\s+(.+)$"),
     LineType.QUOTE: re.compile(r"^>\s*(.*)$"),
     LineType.CODE_START: re.compile(r"^```(\w*)$"),
@@ -11,7 +11,7 @@ LINE_REGEX_PATTERNS = {
     LineType.HORIZONTAL_RULE: re.compile(r"^([\*\-_])\1{2,}$"),
 }
 
-INLINE_REGEX_PATTERNS = {
+INLINE_REGEX = {
     InlineTextType.INLINE_CODE: (re.compile(r"`([^`]+)`"), r"<code>\1</code>"),
     InlineTextType.LINK: (
         re.compile(r"\[([^\]]+)\]\(([^)]+)\)"),
