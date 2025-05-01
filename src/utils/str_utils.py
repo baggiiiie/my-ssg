@@ -111,7 +111,7 @@ def format_code(md: str) -> str:
 
 
 def format_heading(md: str) -> str:
-    lines = md.split(" ", 2)[1]
+    lines = md.split(" ", 1)[1]
     return lines
 
 
