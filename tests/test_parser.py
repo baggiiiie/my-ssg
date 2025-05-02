@@ -68,3 +68,79 @@ class TestInlineParser(unittest.TestCase):
         result = MarkdownParser().inline_parser(md)
         expected = "this is <i><code>code</code></i>"
         self.assertEqual(result, expected)
+
+    def test_md_parser_single_line_p(self):
+        md = "hello world"
+        result = MarkdownParser().line_parse(md)
+        expected = "<p>hello world</p>"
+        self.assertEqual(result, expected)
+
+    def test_md_parser_single_line_h(self):
+        md = "# hello world"
+        result = MarkdownParser().line_parse(md)
+        expected = "<h1>hello world</h1>"
+        self.assertEqual(result, expected)
+
+    def test_md_parser_single_line_not_h(self):
+        md = "#hello world"
+        result = MarkdownParser().line_parse(md)
+        expected = "<p>#hello world</p>"
+        self.assertEqual(result, expected)
+
+    def test_md_parser_single_line_h2(self):
+        md = "## hello world"
+        result = MarkdownParser().line_parse(md)
+        expected = "<h2>hello world</h2>"
+        self.assertEqual(result, expected)
+
+    def test_md_parser_single_line_code(self):
+        md = "this is a `code block`"
+        result = MarkdownParser().line_parse(md)
+        expected = "<p>this is a <code>code block</code></p>"
+        self.assertEqual(result, expected)
+
+    def test_md_parser_single_line_code_format(self):
+        md = "this is a `*code block*`"
+        result = MarkdownParser().line_parse(md)
+        expected = "<p>this is a <code>*code block*</code></p>"
+        self.assertEqual(result, expected)
+
+    def test_md_parser_single_line_format(self):
+        md = "this is a *italic* and **bolded**"
+        result = MarkdownParser().line_parse(md)
+        expected = "<p>this is a <i>italic</i> and <b>bolded</b></p>"
+        self.assertEqual(result, expected)
+
+    def test_md_parser_single_line_nested_format(self):
+        md = "this is a _italic and **bolded**_"
+        result = MarkdownParser().line_parse(md)
+        expected = "<p>this is a <i>italic and <b>bolded</b></i></p>"
+        self.assertEqual(result, expected)
+
+    # TODO: fix parent-children tag
+    # def test_md_parser_single_line_quote(self):
+    #     md = "> this is a quote"
+    #     result = MarkdownParser().line_parse(md)
+    #     expected = "<blockquote><p>this is a quote</p></blockquote>"
+    #     self.assertEqual(result, expected)
+
+
+#     # TODO: fix parent-children tag
+#     def test_md_parser_multi_line_quote(self):
+#         md = """> this is a quote
+# > another quote"""
+#         result = MarkdownParser().line_parse(md)
+#         expected = "<blockquote>this is a quote\nanother quote</blockquote>"
+#         self.assertEqual(result, expected)
+
+
+#     # TODO: fix parent-children tag
+#     def test_md_parser_multi_line_code(self):
+#         md = """this is a
+# ```
+# *code block*
+# ```
+#         """.strip()
+#         result = MarkdownParser().line_parse(md)
+#         expected = "<p>this is a</p><pre><code>*code block*</code></pre>"
+#         self.assertEqual(result, expected)
