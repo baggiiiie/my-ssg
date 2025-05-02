@@ -7,13 +7,14 @@ NEW_LINE_CHAR = "{{new_line}}"
 
 
 class MarkdownParser:
-    def __init__(self): ...
+    def __init__(self):
+        self.final_html_string = ""
 
     def get_line_type(self, md: str) -> LineType:
         for line_type, regex in LINE_REGEX.items():
             if regex.match(md):
                 return line_type
-        return LineType.NONE
+        return LineType.NORMAL
 
     # def get_inline_type(self, md: str) -> InlineTextType:
     #     for text_type, regex in INLINE_REGEX_PATTERNS.items():
@@ -55,6 +56,22 @@ class MarkdownParser:
             md = restore_inline_code(md)
         return md
 
+    def reset_block(self) -> None:
+        # let's treat them all as string now
+        self.current_block_type = BlockType.PARAGRAPH.value
+        self.current_block_content = ""
+        self.others = ""
+
+    def add_to_html_string(self) -> None:
+        tag = self.current_block_type
+        content = self.current_block_content
+        if self.current_block_type != BlockType.CODE.value:
+            content = self.inline_parser(content)
+        # TODO: wrap parent tag
+        # if need_parent_tag:
+        #     ...
+        self.final_html_string += f"<{tag}>{content}</{tag}>"
+
     def line_parse(self, md: str) -> str:
         # from md to html
         # 1. read line by line
@@ -62,45 +79,62 @@ class MarkdownParser:
         # 3. if block, don't format, don't convert inline
         # 4. else, format trailing spaces, convert inline
         # 5. convert to html: add tags
-        final_html_string = ""
-        current_block = {
-            "block_type": None,
-            "content": "",
-        }
+        self.reset_block()
         for line in md.split("\n"):
-            if current_block["block_type"] == BlockType.CODE:
-                # if it's within a code block, just return as is
-                ...
+            line_type = self.get_line_type(line)
+            if self.current_block_type == BlockType.CODE.value:
+                if line_type != LineType.CODE_END:
+                    self.current_block_content += line
+                    continue
+                self.add_to_html_string()
+                self.reset_block()
                 continue
 
             if not line:
-                # empty line means new block
-                ...
-            line_type = self.get_line_type(line)
-            if line_type == LineType.CODE_START:
-                current_block["block_type"] = BlockType.CODE
-                code_block = {
-                    "lang": line.strip()[3:],
-                    "content": "",
-                }
+                # empty line means new block (other than code block)
+                # append current block to final html string
+                # start new block
+                tag = self.current_block_type
+                self.add_to_html_string()
+                self.reset_block()
                 continue
-            if line_type == LineType.CODE_END:
-                # TODO: convert to html string and save to result
+
+            if line_type == LineType.NORMAL:
+                self.current_block_content += line
                 continue
-            if line_type == LineType.HEADING:
+            # elif line_type == LineType.CODE_END:
+            #     self.add_to_html_string()
+            #     self.reset_block()
+            #     continue
+            elif line_type == LineType.CODE_START:
+                self.current_block_type = BlockType.CODE.value
+                self.others = line.strip()[3:]
+                continue
+
+            elif line_type == LineType.HEADING:
                 heading_level = len(line.strip().split(" ")[0])
-                tag = LineType.HEADING.value + str(heading_level)
+                tag = f"h{heading_level}"
+                # manually add first to deal with heading level
+                self.final_html_string += (
+                    f"<{tag}>{self.inline_parser(self.current_block_content)}</{tag}>"
+                )
+                self.reset_block()
+                continue
+            elif line_type == LineType.QUOTE:
+                # TODO: 1. get inline, 2. convert to html string and save to result
+                self.current_block_type = BlockType.QUOTE.value
+                self.current_block_content += line.split(" ", 1)[1]
+                continue
+            elif line_type in (
+                LineType.ORDERED_LIST_ITEM,
+                LineType.UNORDERED_LIST_ITEM,
+            ):
                 # TODO: 1. get inline, 2. convert to html string and save to result
                 ...
-            if line_type == LineType.QUOTE:
-                # TODO: 1. get inline, 2. convert to html string and save to result
+                continue
+            elif line_type == LineType.HORIZONTAL_RULE:
                 ...
-            if line_type in (LineType.ORDERED_LIST_ITEM, LineType.UNORDERED_LIST_ITEM):
-                # TODO: 1. get inline, 2. convert to html string and save to result
-                ...
-            if line_type == LineType.HORIZONTAL_RULE:
-                ...
-            if line_type == LineType.PARAGRAPH:
+            elif line_type == LineType.PARAGRAPH:
                 line = self.trailing_space_handler(line)
                 # TODO: convert to html string and save to result
 

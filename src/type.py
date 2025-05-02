@@ -21,7 +21,7 @@ class LineType(Enum):
     ORDERED_LIST_ITEM = "ol"
     HORIZONTAL_RULE = "hr"
     TABLE = "table"
-    NONE = ""
+    NORMAL = "normal"
 
 
 class BlockChildrenType(Enum):
