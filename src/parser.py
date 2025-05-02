@@ -9,6 +9,7 @@ NEW_LINE_CHAR = "{{new_line}}"
 class MarkdownParser:
     def __init__(self):
         self.final_html_string = ""
+        self.reset_block()
 
     def get_line_type(self, md: str) -> LineType:
         for line_type, regex in LINE_REGEX.items():
@@ -54,6 +55,7 @@ class MarkdownParser:
             md = match_pattern.sub(repalce_pattern, md)
         if inline_code_blocks:
             md = restore_inline_code(md)
+        md.replace(NEW_LINE_CHAR, "<br>")
         return md
 
     def reset_block(self) -> None:
@@ -65,6 +67,8 @@ class MarkdownParser:
     def add_to_html_string(self) -> None:
         tag = self.current_block_type
         content = self.current_block_content
+        if not content:
+            return
         if self.current_block_type != BlockType.CODE.value:
             content = self.inline_parser(content)
         # TODO: wrap parent tag
@@ -79,9 +83,9 @@ class MarkdownParser:
         # 3. if block, don't format, don't convert inline
         # 4. else, format trailing spaces, convert inline
         # 5. convert to html: add tags
-        self.reset_block()
         for line in md.split("\n"):
             line_type = self.get_line_type(line)
+
             if self.current_block_type == BlockType.CODE.value:
                 if line_type != LineType.CODE_END:
                     self.current_block_content += line
@@ -107,17 +111,23 @@ class MarkdownParser:
             #     self.reset_block()
             #     continue
             elif line_type == LineType.CODE_START:
+                self.add_to_html_string()
+                self.reset_block()
                 self.current_block_type = BlockType.CODE.value
                 self.others = line.strip()[3:]
                 continue
 
             elif line_type == LineType.HEADING:
-                heading_level = len(line.strip().split(" ")[0])
+                parts = line.split(" ", 1)
+                heading_level = len(parts[0])
                 tag = f"h{heading_level}"
                 # manually add first to deal with heading level
+                # self.current_block_type = BlockType.HEADING.value
+                self.current_block_content += parts[1].strip()
                 self.final_html_string += (
                     f"<{tag}>{self.inline_parser(self.current_block_content)}</{tag}>"
                 )
+                # self.add_to_html_string()
                 self.reset_block()
                 continue
             elif line_type == LineType.QUOTE:
@@ -129,13 +139,26 @@ class MarkdownParser:
                 LineType.ORDERED_LIST_ITEM,
                 LineType.UNORDERED_LIST_ITEM,
             ):
-                # TODO: 1. get inline, 2. convert to html string and save to result
+                # TODO: need to check indent level
                 ...
                 continue
             elif line_type == LineType.HORIZONTAL_RULE:
-                ...
-            elif line_type == LineType.PARAGRAPH:
+                self.add_to_html_string()
+                self.reset_block()
+                continue
+            else:
                 line = self.trailing_space_handler(line)
                 # TODO: convert to html string and save to result
+                self.current_block_type = BlockType.PARAGRAPH.value
+                self.current_block_content += line
 
-        return ""
+        self.add_to_html_string()
+        return self.final_html_string
+
+
+if __name__ == "__main__":
+    md = "# hello world"
+    # __AUTO_GENERATED_PRINT_VAR_START__
+    print(f" md: {str(md)}")  # __AUTO_GENERATED_PRINT_VAR_END__
+    result = MarkdownParser().line_parse(md)
+    print(result)
