@@ -22,10 +22,10 @@ class BlockChildrenType(Enum):
 
 
 BLOCK_CHILDREN_MAP = {
-    BlockType.PARAGRAPH: BlockChildrenType.PARAGRAPH.value,
-    BlockType.HEADING: BlockChildrenType.HEADING.value,
-    BlockType.CODE: BlockChildrenType.CODE.value,
-    BlockType.QUOTE: BlockChildrenType.QUOTE.value,
-    BlockType.UNORDERED_LIST: BlockChildrenType.UNORDERED_LIST.value,
-    BlockType.ORDERED_LIST: BlockChildrenType.ORDERED_LIST.value,
+    BlockType.PARAGRAPH: BlockChildrenType.PARAGRAPH,
+    BlockType.HEADING: BlockChildrenType.HEADING,
+    BlockType.CODE: BlockChildrenType.CODE,
+    BlockType.QUOTE: BlockChildrenType.QUOTE,
+    BlockType.UNORDERED_LIST: BlockChildrenType.UNORDERED_LIST,
+    BlockType.ORDERED_LIST: BlockChildrenType.ORDERED_LIST,
 }

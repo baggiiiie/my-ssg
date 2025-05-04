@@ -2,6 +2,7 @@ import re
 from htmlblock import BlockType
 from utils import LINE_REGEX, INLINE_REGEX
 from type import LineType, InlineTextType
+from htmlblock import BLOCK_CHILDREN_MAP
 
 NEW_LINE_CHAR = "{{new_line}}"
 
@@ -60,20 +61,20 @@ class MarkdownParser:
 
     def reset_block(self) -> None:
         # let's treat them all as string now
-        self.current_block_type = BlockType.PARAGRAPH.value
-        self.current_block_content = ""
+        self.current_block_tag: BlockType = BlockType.PARAGRAPH
+        self.current_block_content: str = ""
         self.others = ""
 
     def add_to_html_string(self) -> None:
-        tag = self.current_block_type
+        tag = self.current_block_tag.value
+        # parent_tag = BLOCK_CHILDREN_MAP.get(self.current_block_tag)
         content = self.current_block_content
         if not content:
             return
-        if self.current_block_type != BlockType.CODE.value:
+        if self.current_block_tag != BlockType.CODE:
             content = self.inline_parser(content)
-        # TODO: wrap parent tag
-        # if need_parent_tag:
-        #     ...
+        if child_tag := BLOCK_CHILDREN_MAP[self.current_block_tag].value:
+            content = f"<{child_tag}>{content}</{child_tag}>"
         self.final_html_string += f"<{tag}>{content}</{tag}>"
 
     def line_parse(self, md: str) -> str:
@@ -83,10 +84,11 @@ class MarkdownParser:
         # 3. if block, don't format, don't convert inline
         # 4. else, format trailing spaces, convert inline
         # 5. convert to html: add tags
+        md.strip()
         for line in md.split("\n"):
             line_type = self.get_line_type(line)
 
-            if self.current_block_type == BlockType.CODE.value:
+            if self.current_block_tag == BlockType.CODE:
                 if line_type != LineType.CODE_END:
                     self.current_block_content += line
                     continue
@@ -94,11 +96,11 @@ class MarkdownParser:
                 self.reset_block()
                 continue
 
-            if not line:
+            if not line or line.isspace():
                 # empty line means new block (other than code block)
                 # append current block to final html string
                 # start new block
-                tag = self.current_block_type
+                tag = self.current_block_tag.value
                 self.add_to_html_string()
                 self.reset_block()
                 continue
@@ -113,7 +115,7 @@ class MarkdownParser:
             elif line_type == LineType.CODE_START:
                 self.add_to_html_string()
                 self.reset_block()
-                self.current_block_type = BlockType.CODE.value
+                self.current_block_tag = BlockType.CODE
                 self.others = line.strip()[3:]
                 continue
 
@@ -122,7 +124,7 @@ class MarkdownParser:
                 heading_level = len(parts[0])
                 tag = f"h{heading_level}"
                 # manually add first to deal with heading level
-                # self.current_block_type = BlockType.HEADING.value
+                # self.current_block_type = BlockType.HEADING
                 self.current_block_content += parts[1].strip()
                 self.final_html_string += (
                     f"<{tag}>{self.inline_parser(self.current_block_content)}</{tag}>"
@@ -131,8 +133,7 @@ class MarkdownParser:
                 self.reset_block()
                 continue
             elif line_type == LineType.QUOTE:
-                # TODO: 1. get inline, 2. convert to html string and save to result
-                self.current_block_type = BlockType.QUOTE.value
+                self.current_block_tag = BlockType.QUOTE
                 self.current_block_content += line.split(" ", 1)[1]
                 continue
             elif line_type in (
@@ -149,7 +150,7 @@ class MarkdownParser:
             else:
                 line = self.trailing_space_handler(line)
                 # TODO: convert to html string and save to result
-                self.current_block_type = BlockType.PARAGRAPH.value
+                self.current_block_tag = BlockType.PARAGRAPH
                 self.current_block_content += line
 
         self.add_to_html_string()
@@ -157,8 +158,12 @@ class MarkdownParser:
 
 
 if __name__ == "__main__":
-    md = "# hello world"
+    md = """```
+i need a parent tag
+```
+    """
+
     # __AUTO_GENERATED_PRINT_VAR_START__
-    print(f" md: {str(md)}")  # __AUTO_GENERATED_PRINT_VAR_END__
+    print(rf" md: {md}")  # __AUTO_GENERATED_PRINT_VAR_END__
     result = MarkdownParser().line_parse(md)
     print(result)
