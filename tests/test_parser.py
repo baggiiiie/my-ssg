@@ -69,6 +69,18 @@ class TestInlineParser(unittest.TestCase):
         expected = "this is <i><code>code</code></i>"
         self.assertEqual(result, expected)
 
+    def test_inline_parser_link(self):
+        md = "this is a [link](https://example.com)"
+        result = MarkdownParser().inline_parser(md)
+        expected = 'this is a <a href="https://example.com">link</a>'
+        self.assertEqual(result, expected)
+
+    def test_inline_parser_img(self):
+        md = "this is an ![img](https://example.com)"
+        result = MarkdownParser().inline_parser(md)
+        expected = "this is an <img src=https://exmaple.com>link</img>"
+        self.assertEqual(result, expected)
+
     def test_md_parser_single_line_p(self):
         md = "hello world"
         result = MarkdownParser().line_parse(md)
@@ -146,4 +158,20 @@ new line
         """
         result = MarkdownParser().line_parse(md)
         expected = "<p>this is a<br>new line</p>"
+        self.assertEqual(result, expected)
+
+    def test_md_parser_multi_line_with_link(self):
+        md = """this is a [link](https://example.com)  
+hello
+        """
+        result = MarkdownParser().line_parse(md)
+        expected = '<p>this is a <a href="https://example.com">link</a><br>hello</p>'
+        self.assertEqual(result, expected)
+
+    def test_md_parser_multi_line_with_img(self):
+        md = """this is a ![link](link-to-img)  
+hello
+        """
+        result = MarkdownParser().line_parse(md)
+        expected = 'this is a <img src="link-to-img" alt="link>link</img><br>hello'
         self.assertEqual(result, expected)
