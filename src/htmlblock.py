@@ -16,7 +16,7 @@ class BlockChildrenType(Enum):
     PARAGRAPH = None
     HEADING = None
     CODE = "code"
-    QUOTE = None
+    QUOTE = "p"
     UNORDERED_LIST = "li"
     ORDERED_LIST = "li"
 

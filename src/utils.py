@@ -18,6 +18,7 @@ INLINE_REGEX = {
         r'<a href="\2">\1</a>',
     ),
     InlineTextType.IMAGE: (
+        # TOOD: link replacement is currently broken
         re.compile(r"!\[([^\]]*)\]\(([^)]+)\)"),
         r'<img src="\2" alt="\1">',
     ),

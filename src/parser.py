@@ -27,7 +27,7 @@ class MarkdownParser:
     def trailing_space_handler(self, md: str) -> str:
         if md.endswith(" "):
             md = md.rstrip() + NEW_LINE_CHAR
-        return ""
+        return md
 
     def inline_parser(self, md: str) -> str:
         # deal with inline text
@@ -56,7 +56,7 @@ class MarkdownParser:
             md = match_pattern.sub(repalce_pattern, md)
         if inline_code_blocks:
             md = restore_inline_code(md)
-        md.replace(NEW_LINE_CHAR, "<br>")
+        md = md.replace(NEW_LINE_CHAR, "<br>")
         return md
 
     def reset_block(self) -> None:
@@ -84,7 +84,6 @@ class MarkdownParser:
         # 3. if block, don't format, don't convert inline
         # 4. else, format trailing spaces, convert inline
         # 5. convert to html: add tags
-        md.strip()
         for line in md.split("\n"):
             line_type = self.get_line_type(line)
 
@@ -105,9 +104,9 @@ class MarkdownParser:
                 self.reset_block()
                 continue
 
-            if line_type == LineType.NORMAL:
-                self.current_block_content += line
-                continue
+            # if line_type == LineType.NORMAL:
+            #     self.current_block_content += line
+            #     continue
             # elif line_type == LineType.CODE_END:
             #     self.add_to_html_string()
             #     self.reset_block()
@@ -133,6 +132,7 @@ class MarkdownParser:
                 self.reset_block()
                 continue
             elif line_type == LineType.QUOTE:
+                line = self.trailing_space_handler(line)
                 self.current_block_tag = BlockType.QUOTE
                 self.current_block_content += line.split(" ", 1)[1]
                 continue
@@ -149,7 +149,6 @@ class MarkdownParser:
                 continue
             else:
                 line = self.trailing_space_handler(line)
-                # TODO: convert to html string and save to result
                 self.current_block_tag = BlockType.PARAGRAPH
                 self.current_block_content += line
 
@@ -158,10 +157,9 @@ class MarkdownParser:
 
 
 if __name__ == "__main__":
-    md = """```
-i need a parent tag
-```
-    """
+    md = """this is a  
+new line
+        """
 
     # __AUTO_GENERATED_PRINT_VAR_START__
     print(rf" md: {md}")  # __AUTO_GENERATED_PRINT_VAR_END__
