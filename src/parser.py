@@ -20,8 +20,10 @@ class MarkdownParser:
         return LineType.NORMAL
 
     def trailing_space_handler(self, md: str) -> str:
-        if md.endswith(" "):
-            md = md.rstrip() + NEW_LINE_CHAR
+        if md.endswith("  "):
+            md = md.strip() + NEW_LINE_CHAR
+        else:
+            md = md.strip() + " "
         return md
 
     def inline_parser(self, md: str) -> str:
@@ -69,9 +71,9 @@ class MarkdownParser:
             if self.current_block_type != BlockType.CODE:
                 line = self.inline_parser(line)
             if child_tag := BLOCK_CHILDREN_MAP[self.current_block_type].value:
-                line = f"<{child_tag}>{line}</{child_tag}>"
+                line = f"<{child_tag}>{line.strip()}</{child_tag}>"
             parent_content += line
-        self.final_html_string += f"<{tag}>{parent_content}</{tag}>"
+        self.final_html_string += f"<{tag}>{parent_content.strip()}</{tag}>"
 
     def line_parse(self, md: str) -> str:
         # from md to html
@@ -122,8 +124,8 @@ class MarkdownParser:
                 # TODO: we can definitely use regex's matching group to do this
                 # string extraction, like $1 $2 etc, instead of this kind of
                 # line.split
-                line = line.split(" ", 1)[1]
                 line = self.trailing_space_handler(line)
+                line = line.split(" ", 1)[1]
                 self.current_block_type = BlockType.QUOTE
                 # TODO: this doesn't seem too ideal to me
                 if not self.current_block_content:
@@ -154,9 +156,14 @@ class MarkdownParser:
 
 
 if __name__ == "__main__":
-    md = """> this is a quote  
-> another quote"""
+    md = """
+    This is **bolded** paragraph
+    text in a p
+    tag here
 
+    This is another paragraph with _italic_ text and `code` here
+
+    """
     # __AUTO_GENERATED_PRINT_VAR_START__
     print(rf" md: {md}")  # __AUTO_GENERATED_PRINT_VAR_END__
     result = MarkdownParser().line_parse(md)
