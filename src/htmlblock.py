@@ -12,6 +12,13 @@ class BlockType(Enum):
     TABLE = "table"
 
 
+# TODO:
+# actually for code block and blockquote, it's not really children tags
+# for list, it's every child(line in block) has a tag for itself
+# but for code, not every line in code block has a tag
+# it's more like the parent has double tags
+
+
 class BlockChildrenType(Enum):
     PARAGRAPH = None
     HEADING = None
