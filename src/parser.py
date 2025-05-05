@@ -5,6 +5,7 @@ from type import LineType, InlineTextType
 from htmlblock import BLOCK_CHILDREN_MAP
 
 NEW_LINE_CHAR = "{{new_line}}"
+INLINE_CODE_PLACE_HOLDER = "${{PLACEHOLDER}}$"
 
 
 class MarkdownParser:
@@ -18,12 +19,6 @@ class MarkdownParser:
                 return line_type
         return LineType.NORMAL
 
-    # def get_inline_type(self, md: str) -> InlineTextType:
-    #     for text_type, regex in INLINE_REGEX_PATTERNS.items():
-    #         if regex.match(md):
-    #             return text_type
-    #     return InlineTextType.TEXT
-
     def trailing_space_handler(self, md: str) -> str:
         if md.endswith(" "):
             md = md.rstrip() + NEW_LINE_CHAR
@@ -31,7 +26,6 @@ class MarkdownParser:
 
     def inline_parser(self, md: str) -> str:
         # deal with inline text
-        INLINE_CODE_PLACE_HOLDER = "${{PLACEHOLDER}}$"
         inline_code_blocks = []
         code_match_pattern, code_replace_pattern = INLINE_REGEX[
             InlineTextType.INLINE_CODE
@@ -51,7 +45,7 @@ class MarkdownParser:
             return md
 
         md = inline_code_replace(md)
-        for text_type, regex in INLINE_REGEX.items():
+        for _, regex in INLINE_REGEX.items():
             match_pattern, repalce_pattern = regex
             md = match_pattern.sub(repalce_pattern, md)
         if inline_code_blocks:
@@ -61,19 +55,19 @@ class MarkdownParser:
 
     def reset_block(self) -> None:
         # let's treat them all as string now
-        self.current_block_tag: BlockType = BlockType.PARAGRAPH
+        self.current_block_type: BlockType = BlockType.PARAGRAPH
         self.current_block_content: str = ""
         self.others = ""
 
     def add_to_html_string(self) -> None:
-        tag = self.current_block_tag.value
+        tag = self.current_block_type.value
         # parent_tag = BLOCK_CHILDREN_MAP.get(self.current_block_tag)
         content = self.current_block_content
         if not content:
             return
-        if self.current_block_tag != BlockType.CODE:
+        if self.current_block_type != BlockType.CODE:
             content = self.inline_parser(content)
-        if child_tag := BLOCK_CHILDREN_MAP[self.current_block_tag].value:
+        if child_tag := BLOCK_CHILDREN_MAP[self.current_block_type].value:
             content = f"<{child_tag}>{content}</{child_tag}>"
         self.final_html_string += f"<{tag}>{content}</{tag}>"
 
@@ -87,7 +81,7 @@ class MarkdownParser:
         for line in md.split("\n"):
             line_type = self.get_line_type(line)
 
-            if self.current_block_tag == BlockType.CODE:
+            if self.current_block_type == BlockType.CODE:
                 if line_type != LineType.CODE_END:
                     self.current_block_content += line
                     continue
@@ -99,22 +93,15 @@ class MarkdownParser:
                 # empty line means new block (other than code block)
                 # append current block to final html string
                 # start new block
-                tag = self.current_block_tag.value
+                tag = self.current_block_type.value
                 self.add_to_html_string()
                 self.reset_block()
                 continue
 
-            # if line_type == LineType.NORMAL:
-            #     self.current_block_content += line
-            #     continue
-            # elif line_type == LineType.CODE_END:
-            #     self.add_to_html_string()
-            #     self.reset_block()
-            #     continue
             elif line_type == LineType.CODE_START:
                 self.add_to_html_string()
                 self.reset_block()
-                self.current_block_tag = BlockType.CODE
+                self.current_block_type = BlockType.CODE
                 self.others = line.strip()[3:]
                 continue
 
@@ -133,7 +120,7 @@ class MarkdownParser:
                 continue
             elif line_type == LineType.QUOTE:
                 line = self.trailing_space_handler(line)
-                self.current_block_tag = BlockType.QUOTE
+                self.current_block_type = BlockType.QUOTE
                 self.current_block_content += line.split(" ", 1)[1]
                 continue
             elif line_type in (
@@ -149,7 +136,7 @@ class MarkdownParser:
                 continue
             else:
                 line = self.trailing_space_handler(line)
-                self.current_block_tag = BlockType.PARAGRAPH
+                self.current_block_type = BlockType.PARAGRAPH
                 self.current_block_content += line
 
         self.add_to_html_string()
