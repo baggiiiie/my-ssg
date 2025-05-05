@@ -13,14 +13,14 @@ LINE_REGEX = {
 
 INLINE_REGEX = {
     InlineTextType.INLINE_CODE: (re.compile(r"`([^`]+)`"), "<code>{}</code>"),
-    InlineTextType.LINK: (
-        re.compile(r"\[([^\]]+)\]\(([^)]+)\)"),
-        r'<a href="\2">\1</a>',
-    ),
     InlineTextType.IMAGE: (
         # TOOD: link replacement is currently broken
         re.compile(r"!\[([^\]]*)\]\(([^)]+)\)"),
         r'<img src="\2" alt="\1">',
+    ),
+    InlineTextType.LINK: (
+        re.compile(r"\[([^\]]+)\]\(([^)]+)\)"),
+        r'<a href="\2">\1</a>',
     ),
     InlineTextType.BOLD: (
         re.compile(r"\*\*([^*]+)\*\*|__([^_]+)__"),
