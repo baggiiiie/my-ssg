@@ -47,12 +47,12 @@ class MarkdownParser:
             return md
 
         md = inline_code_replace(md)
-        md = md.replace(NEW_LINE_CHAR, "<br>")
         for _, regex in INLINE_REGEX.items():
             match_pattern, repalce_pattern = regex
             md = match_pattern.sub(repalce_pattern, md)
         if inline_code_blocks:
             md = restore_inline_code(md)
+        md = md.replace(NEW_LINE_CHAR, "<br>")
         return md
 
     def reset_block(self) -> None:
@@ -71,6 +71,7 @@ class MarkdownParser:
             if self.current_block_type != BlockType.CODE:
                 line = self.inline_parser(line)
             if child_tag := BLOCK_CHILDREN_MAP[self.current_block_type].value:
+                # TODO: code shouldn't be striped by `line.strip()`
                 line = f"<{child_tag}>{line.strip()}</{child_tag}>"
             parent_content += line
         self.final_html_string += f"<{tag}>{parent_content.strip()}</{tag}>"
@@ -157,14 +158,12 @@ class MarkdownParser:
 
 if __name__ == "__main__":
     md = """
-    This is **bolded** paragraph
-    text in a p
-    tag here
-
-    This is another paragraph with _italic_ text and `code` here
-
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
     """
     # __AUTO_GENERATED_PRINT_VAR_START__
     print(rf" md: {md}")  # __AUTO_GENERATED_PRINT_VAR_END__
-    result = MarkdownParser().line_parse(md)
+    result = MarkdownParser().line_parse(md.strip())
     print(result)
