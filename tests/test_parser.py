@@ -198,14 +198,14 @@ class TestTextToHtml(unittest.TestCase):
 
     def test_codeblock(self):
         md = """
-    ```
+```
 This is text that _should_ remain
 the **same** even with inline stuff
-    ```
+```
     """
 
         html = MarkdownParser().line_parse(md.strip())
-        expected = r"<pre><code>This is text that _should_ remain<br>the **same** even with inline stuff</code></pre>"
+        expected = "<pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre>"
         self.assertEqual(
             html,
             expected,
@@ -214,9 +214,9 @@ the **same** even with inline stuff
 
     def test_unordered_list(self):
         md = """
-    - item 1 with trailing spaces  
-    - item 2
-    """
+- item 1 with trailing spaces  
+- item 2
+"""
 
         html = MarkdownParser().line_parse(md.strip())
         expected = r"<ul><li>item 1 with trailing spaces</li><li>item 2</li></ul>"
@@ -242,23 +242,23 @@ the **same** even with inline stuff
 
     def test_all(self):
         md = """
-    this is a paragraph with trailing spaces  
-    **new line here**
-    _same line_
+this is a paragraph with trailing spaces  
+**new line here**
+_same line_
 
 > quote line 1 with trailing spaces  
 > quote line 2 
 
-    ```
-    code block **bolded**
-    ```
+```
+code block **bolded**
+```
 
-    1. list item 1  
-    2. item 2
-    """
+1. list item 1  
+2. item 2
+"""
 
         html = MarkdownParser().line_parse(md.strip())
-        expected = """<p>this is a paragraph with trailing spaces<br><b>new line here</b> <i>same line</i></p><blockquote><p>quote line 1 with trailing spaces<br>quote line 2</p></blockquote><pre><code>code block **bolded**</code></pre><ol><li>list item 1</li><li> item 2</li></ol>""".strip()
+        expected = """<p>this is a paragraph with trailing spaces<br><b>new line here</b> <i>same line</i></p><blockquote><p>quote line 1 with trailing spaces<br>quote line 2</p></blockquote><pre><code>code block **bolded**</code></pre><ol><li>list item 1</li><li>item 2</li></ol>"""
         self.assertEqual(
             html,
             expected,
@@ -315,17 +315,14 @@ the **same** even with inline stuff
             f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
         )
 
-    def test_code_in_code_block(self):
-        md = r"""
-        ```
-        code \n format
-        ```
-        """.strip()
+    def test_escape_sequence_in_code_block(self):
+        md = """
+```
+code\nformat
+```
+        """
         html = MarkdownParser().line_parse(md.strip())
-        expected = """
-            <div><pre><code>code \n format
-            </code></pre></div>"
-            """
+        expected = r"""<div><pre><code>code\nformat</code></pre></div>"""
         self.assertEqual(
             html,
             expected,

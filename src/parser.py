@@ -74,7 +74,11 @@ class MarkdownParser:
                 # TODO: code shouldn't be striped by `line.strip()`
                 line = f"<{child_tag}>{line.strip()}</{child_tag}>"
             parent_content += line
-        self.final_html_string += f"<{tag}>{parent_content.strip()}</{tag}>"
+        if self.current_block_type == BlockType.CODE:
+            # TODO: need to preserve escape sequence in code block
+            self.final_html_string += rf"<{tag}>{parent_content.strip()}</{tag}>"
+        else:
+            self.final_html_string += f"<{tag}>{parent_content.strip()}</{tag}>"
 
     def line_parse(self, md: str) -> str:
         # from md to html
@@ -87,8 +91,10 @@ class MarkdownParser:
             line_type = self.get_line_type(line)
 
             if self.current_block_type == BlockType.CODE:
+                if not self.current_block_content:
+                    self.current_block_content.append("")
                 if line_type != LineType.CODE_END:
-                    self.current_block_content.append(line)
+                    self.current_block_content[0] += line + "\n"
                     continue
                 self.add_to_html_string()
                 self.reset_block()
@@ -139,7 +145,10 @@ class MarkdownParser:
             ):
                 # TODO: need to check indent level, the strip() here wouldn't work
                 line = line.strip().split(" ", 1)[1]
-                self.current_block_type = BlockType.UNORDERED_LIST
+                if line_type == LineType.ORDERED_LIST_ITEM:
+                    self.current_block_type = BlockType.ORDERED_LIST
+                else:
+                    self.current_block_type = BlockType.UNORDERED_LIST
                 self.current_block_content.append(line)
                 continue
             elif line_type == LineType.HORIZONTAL_RULE:
@@ -157,11 +166,9 @@ class MarkdownParser:
 
 if __name__ == "__main__":
     md = """
-```
-This is text that _should_ remain
-the **same** even with inline stuff
-```
-    """
+1. list   
+2. list
+"""
     # __AUTO_GENERATED_PRINT_VAR_START__
     print(rf" md: {md}")  # __AUTO_GENERATED_PRINT_VAR_END__
     result = MarkdownParser().line_parse(md.strip())
