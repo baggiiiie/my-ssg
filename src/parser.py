@@ -98,7 +98,6 @@ class MarkdownParser:
                 # empty line means new block (other than code block)
                 # append current block to final html string
                 # start new block
-                tag = self.current_block_type.value
                 self.add_to_html_string()
                 self.reset_block()
                 continue
