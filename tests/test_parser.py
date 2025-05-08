@@ -315,6 +315,20 @@ code block **bolded**
             f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
         )
 
+    def test_code_block_with_lang(self):
+        md = """
+```go
+code
+```
+        """
+        html = MarkdownParser().line_parse(md.strip())
+        expected = r"""<pre><code>code</code></pre>"""
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )
+
     def test_escape_sequence_in_code_block(self):
         md = """
 ```

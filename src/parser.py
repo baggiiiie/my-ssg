@@ -97,7 +97,7 @@ class MarkdownParser:
             if self.current_block_type == BlockType.CODE:
                 if not self.current_block_content:
                     self.current_block_content.append("")
-                if line_type != LineType.CODE_END:
+                if line_type not in (LineType.CODE_START, LineType.CODE_END):
                     self.current_block_content[0] += line + "\n"
                     continue
                 self.add_to_html_string()

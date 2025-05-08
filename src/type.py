@@ -15,7 +15,7 @@ class LineType(Enum):
     HEADING = "h"
     CODE = "pre"
     CODE_START = "code_start"
-    CODE_END = "code_start"
+    CODE_END = "code_end"
     QUOTE = "blockquote"
     UNORDERED_LIST_ITEM = "ul"
     ORDERED_LIST_ITEM = "ol"
