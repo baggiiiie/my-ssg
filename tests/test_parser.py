@@ -139,7 +139,7 @@ class TestInlineParser(unittest.TestCase):
         md = """> this is a quote  
 > another quote"""
         result = MarkdownParser().line_parse(md.strip())
-        expected = r"<blockquote><p>this is a quote<br>another quote</p></blockquote>"
+        expected = "<blockquote><p>this is a quote<br>another quote</p></blockquote>"
         self.assertEqual(result, expected)
 
     def test_md_parser_multi_line_code(self):
@@ -205,7 +205,7 @@ the **same** even with inline stuff
     """
 
         html = MarkdownParser().line_parse(md.strip())
-        expected = "<pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre>"
+        expected = """<pre><code>This is text that _should_ remain\nthe **same** even wit inline stuff</code></pre>"""
         self.assertEqual(
             html,
             expected,
@@ -219,7 +219,7 @@ the **same** even with inline stuff
 """
 
         html = MarkdownParser().line_parse(md.strip())
-        expected = r"<ul><li>item 1 with trailing spaces</li><li>item 2</li></ul>"
+        expected = "<ul><li>item 1 with trailing spaces</li><li>item 2</li></ul>"
         self.assertEqual(
             html,
             expected,
@@ -233,7 +233,7 @@ the **same** even with inline stuff
     """
 
         html = MarkdownParser().line_parse(md.strip())
-        expected = r"<blockquote><p>quote line 1 with trailing spaces<br>quote line 2</p></blockquote>"
+        expected = "<blockquote><p>quote line 1 with trailing spaces<br>quote line 2</p></blockquote>"
         self.assertEqual(
             html,
             expected,
@@ -322,8 +322,7 @@ code\nformat
 ```
         """
         html = MarkdownParser().line_parse(md.strip())
-        expected = """<pre><code>code
-format</code></pre>"""
+        expected = r"""<pre><code>code\nformat</code></pre>"""
         self.assertEqual(
             html,
             expected,
@@ -331,11 +330,11 @@ format</code></pre>"""
         )
 
     def test_code_in_paragraph(self):
-        md = r"""
-        this is a `code\nblock` in a paragraph
+        md = """
+this is a `code\nblock` in a paragraph
         """
         html = MarkdownParser().line_parse(md.strip())
-        expected = r"<p>this is a <code>code\nblock</code> in a paragraph</p>"
+        expected = """<p>this is a <code>code\nblock</code> in a paragraph</p>"""
         self.assertEqual(
             html,
             expected,

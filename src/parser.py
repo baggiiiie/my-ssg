@@ -34,6 +34,7 @@ class MarkdownParser:
         ]
 
         def inline_code_replace(md: str) -> str:
+            md = md.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             inline_code_blocks.extend(re.findall(code_match_pattern, md))
             return code_match_pattern.sub(INLINE_CODE_PLACE_HOLDER, md)
 
@@ -70,7 +71,10 @@ class MarkdownParser:
         for line in content:
             if self.current_block_type != BlockType.CODE:
                 line = self.inline_parser(line)
+            # else:
+            #     line = repr(line).strip("'")
             if child_tag := BLOCK_CHILDREN_MAP[self.current_block_type].value:
+                # TODO: code shouldn't be striped by `line.strip()`
                 line = f"<{child_tag}>{line.strip()}</{child_tag}>"
             parent_content += line
         if self.current_block_type == BlockType.CODE:
