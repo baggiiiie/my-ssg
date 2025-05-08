@@ -1,8 +1,10 @@
+import os
 import re
 from htmlblock import BlockType
-from utils import LINE_REGEX, INLINE_REGEX
+from utils.utils import LINE_REGEX, INLINE_REGEX
 from type import LineType, InlineTextType
 from htmlblock import BLOCK_CHILDREN_MAP
+from utils.utils import extract_title
 
 NEW_LINE_CHAR = "{{new_line}}"
 INLINE_CODE_PLACE_HOLDER = "${{PLACEHOLDER}}$"
@@ -166,12 +168,45 @@ class MarkdownParser:
         return self.final_html_string
 
 
-if __name__ == "__main__":
-    md = """
-1. list   
-2. list
-"""
-    # __AUTO_GENERATED_PRINT_VAR_START__
-    print(rf" md: {md}")  # __AUTO_GENERATED_PRINT_VAR_END__
-    result = MarkdownParser().line_parse(md.strip())
-    print(result)
+SRC_MD_PATH, DST_HTML_PATH = "content/index.md", "public/index.html"
+TEMPLATE_PATH = "template.html"
+
+
+def generate_page(
+    src_md_path: str = SRC_MD_PATH,
+    dst_html_path: str = DST_HTML_PATH,
+    html_template_path: str = TEMPLATE_PATH,
+) -> None:
+    src_str = open(src_md_path, "r").read()
+    template_str = open(html_template_path, "r").read()
+    src_html_str = MarkdownParser().line_parse(src_str)
+    title = extract_title(src_str)
+    output_html_str = template_str.replace("{{ Content }}", src_html_str).replace(
+        "{{ Title }}", title
+    )
+    if os.path.exists(dst_html_path):
+        os.remove(dst_html_path)
+    os.makedirs(os.path.dirname(dst_html_path), exist_ok=True)
+    with open(dst_html_path, "w") as f:
+        print(f"abs path is {os.path.abspath(dst_html_path)}")
+        print(f"Writing to {dst_html_path}")
+        f.write(output_html_str)
+
+
+def generate_pages(
+    src_dir: str, dst_dir: str, template_path: str = TEMPLATE_PATH
+) -> None:
+    dir_content = os.listdir(src_dir)
+    for content in dir_content:
+        content_path = os.path.join(src_dir, content)
+        if os.path.isdir(content_path):
+            generate_pages(
+                os.path.join(src_dir, content),
+                os.path.join(dst_dir, content),
+            )
+        elif content.endswith(".md"):
+            generate_page(
+                src_md_path=content_path,
+                dst_html_path=os.path.join(dst_dir, content[:-3] + ".html"),
+                html_template_path=template_path,
+            )

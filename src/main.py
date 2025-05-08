@@ -1,5 +1,5 @@
 from utils.file_utils import copy_dir
-from utils.utils import generate_pages
+from parser import generate_pages
 
 
 if __name__ == "__main__":
