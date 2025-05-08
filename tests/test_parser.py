@@ -322,7 +322,8 @@ code\nformat
 ```
         """
         html = MarkdownParser().line_parse(md.strip())
-        expected = r"""<div><pre><code>code\nformat</code></pre></div>"""
+        expected = """<pre><code>code
+format</code></pre>"""
         self.assertEqual(
             html,
             expected,

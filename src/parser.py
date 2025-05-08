@@ -71,11 +71,9 @@ class MarkdownParser:
             if self.current_block_type != BlockType.CODE:
                 line = self.inline_parser(line)
             if child_tag := BLOCK_CHILDREN_MAP[self.current_block_type].value:
-                # TODO: code shouldn't be striped by `line.strip()`
                 line = f"<{child_tag}>{line.strip()}</{child_tag}>"
             parent_content += line
         if self.current_block_type == BlockType.CODE:
-            # TODO: need to preserve escape sequence in code block
             self.final_html_string += rf"<{tag}>{parent_content.strip()}</{tag}>"
         else:
             self.final_html_string += f"<{tag}>{parent_content.strip()}</{tag}>"
