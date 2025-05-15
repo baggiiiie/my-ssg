@@ -6,7 +6,7 @@ from type import LineType, InlineTextType
 from htmlblock import BLOCK_CHILDREN_MAP
 from utils.utils import extract_title
 
-NEW_LINE_CHAR = "{{new_line}}"
+NEW_LINE_CHAR = "{{NEWLINECHAR}}"
 INLINE_CODE_PLACE_HOLDER = "${{PLACEHOLDER}}$"
 
 
@@ -134,7 +134,7 @@ class MarkdownParser:
                 # TODO: we can definitely use regex's matching group to do this
                 # string extraction, like $1 $2 etc, instead of this kind of
                 # line.split
-                line = line.split("> ", 1)[1]
+                line = line.split(">", 1)[1].lstrip()
                 line = self.trailing_space_handler(line)
                 self.current_block_type = BlockType.QUOTE
                 # TODO: this doesn't seem too ideal to me
@@ -211,5 +211,3 @@ def generate_pages(
                 dst_html_path=os.path.join(dst_dir, content[:-3] + ".html"),
                 html_template_path=template_path,
             )
-
-
