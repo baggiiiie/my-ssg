@@ -197,7 +197,7 @@ class TestTextToHtml(unittest.TestCase):
         )
 
     def test_codeblock(self):
-        md = """
+        md = r"""
 ```
 This is text that _should_ remain
 the **same** even with inline stuff
@@ -205,7 +205,7 @@ the **same** even with inline stuff
     """
 
         html = MarkdownParser().line_parse(md.strip())
-        expected = """<pre><code>This is text that _should_ remain\nthe **same** even wit inline stuff</code></pre>"""
+        expected = """<pre><code>This is text that _should_ remain\nthe **same** even with inline stuff</code></pre>"""
         self.assertEqual(
             html,
             expected,
@@ -330,7 +330,7 @@ code
         )
 
     def test_escape_sequence_in_code_block(self):
-        md = """
+        md = r"""
 ```
 code\nformat
 ```
@@ -344,11 +344,11 @@ code\nformat
         )
 
     def test_code_in_paragraph(self):
-        md = """
+        md = r"""
 this is a `code\nblock` in a paragraph
         """
         html = MarkdownParser().line_parse(md.strip())
-        expected = """<p>this is a <code>code\nblock</code> in a paragraph</p>"""
+        expected = r"""<p>this is a <code>code\nblock</code> in a paragraph</p>"""
         self.assertEqual(
             html,
             expected,
