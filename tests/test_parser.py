@@ -354,3 +354,18 @@ this is a `code\nblock` in a paragraph
             expected,
             f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
         )
+
+    def test_br_in_quote(self):
+        md = """
+> this is a line  
+> this is a new line
+        """
+        html = MarkdownParser().line_parse(md.strip())
+        expected = (
+            "<blockquote><p>this is a line<br>this is a new line</p></blockquote>"
+        )
+        self.assertEqual(
+            html,
+            expected,
+            f"\nhtml text is:\n{html}\nexpected is:\n{expected}",
+        )

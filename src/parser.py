@@ -36,7 +36,7 @@ class MarkdownParser:
         ]
 
         def inline_code_replace(md: str) -> str:
-            md = md.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            # md = md.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             inline_code_blocks.extend(re.findall(code_match_pattern, md))
             return code_match_pattern.sub(INLINE_CODE_PLACE_HOLDER, md)
 
@@ -134,8 +134,8 @@ class MarkdownParser:
                 # TODO: we can definitely use regex's matching group to do this
                 # string extraction, like $1 $2 etc, instead of this kind of
                 # line.split
+                line = line.split("> ", 1)[1]
                 line = self.trailing_space_handler(line)
-                line = line.split(" ", 1)[1]
                 self.current_block_type = BlockType.QUOTE
                 # TODO: this doesn't seem too ideal to me
                 if not self.current_block_content:
@@ -156,6 +156,7 @@ class MarkdownParser:
                 self.current_block_content.append(line)
                 continue
             elif line_type == LineType.HORIZONTAL_RULE:
+                # TODO: this hasn't been done
                 self.add_to_html_string()
                 self.reset_block()
                 continue
@@ -210,3 +211,5 @@ def generate_pages(
                 dst_html_path=os.path.join(dst_dir, content[:-3] + ".html"),
                 html_template_path=template_path,
             )
+
+
